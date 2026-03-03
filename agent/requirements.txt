@@ -1,0 +1,11 @@
+langgraph
+langchain-core
+langchain-openai
+fastapi
+uvicorn
+langchain[openai]
+python-dotenv
+pydantic
+pydantic_settings
+pinecone
+langchain_pinecone

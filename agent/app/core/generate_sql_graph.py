@@ -29,7 +29,7 @@ get_schema_tool = next(tool for tool in db_tools if tool.name == "sql_db_schema"
 get_schema_node = ToolNode([get_schema_tool], name="get_schema")
 
 run_query_tool = next(tool for tool in db_tools if tool.name == "sql_db_query")
-run_query_node = ToolNode([run_query_tool], name="run_query")
+run_query_node = ToolNode([run_query_tool], name="run_query") # executes tool and adds output to messages[]
 
 
 def list_tables(state: SQLGenerateState):

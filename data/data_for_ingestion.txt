@@ -1,0 +1,32 @@
+[
+{
+"data": "Fruit classification basics\n\nFruits are the seed-bearing structures of flowering plants. In everyday language, fruit includes many sweet plant foods, but botanically it also includes things like tomatoes and cucumbers. Culinary classification tends to group fruits by taste, use, and texture, while botanical classification focuses on plant families and reproductive structures."
+},
+{
+"data": "Major fruit-growing regions worldwide\n\nTropical fruits such as bananas, mangoes, and pineapples thrive in warm regions near the equator. Temperate fruits like apples and pears grow best in areas with cooler seasons and often require chilling periods. Mediterranean climates are especially suitable for citrus fruits and grapes due to mild winters and dry summers."
+},
+{
+"data": "Seasonality and supply chains\n\nSeasonality affects flavor, price, and availability of fruits. Modern supply chains and refrigerated storage allow many fruits to be sold year-round, but fruits harvested during their natural season often taste better and cost less. Importing fruit from regions where it is currently harvest time is called counter-season sourcing."
+},
+{
+"data": "Common fruit families and examples\n\nSeveral plant families contain many well-known fruits. The Rosaceae family includes apples, pears, and strawberries. The Rutaceae family includes citrus fruits such as oranges and lemons. Musaceae contains bananas, while Vitaceae contains grapes. Fruits within the same family often share structural and evolutionary similarities."
+},
+{
+"data": "Flavor perception and ripeness\n\nThe flavor of fruits depends on sugar levels, acids, aromatic compounds, and texture. As fruits ripen, starches are converted into sugars and the fruit softens while producing characteristic aromas. Some fruits, such as bananas, continue to ripen after harvest, while others, such as many berries, do not significantly improve in flavor once picked."
+},
+{
+"data": "Nutrition overview\n\nFruits commonly provide dietary fiber, vitamins, minerals, and water. Citrus fruits are well known for their vitamin C content, bananas are rich in potassium, and many berries contain beneficial plant compounds. The exact nutritional profile of a fruit depends on its species, cultivar, ripeness, and growing conditions."
+},
+{
+"data": "Storage and handling\n\nDifferent fruits require different storage conditions. Some fruits store well in refrigeration, while others are sensitive to cold temperatures. Certain fruits produce ethylene gas, which accelerates ripening in nearby produce. Proper storage and careful handling help maintain freshness and reduce spoilage."
+},
+{
+"data": "Culinary uses around the world\n\nFruits are consumed fresh, dried, juiced, fermented, cooked, or preserved. Many cuisines use fruits in both sweet and savory dishes, such as citrus with seafood or mango in salads. Cultural traditions influence how fruits are prepared, served, and combined with other ingredients."
+},
+{
+"data": "Cultivars, breeding, and hybrids\n\nMany fruits available in markets are specific cultivars selected for qualities such as sweetness, appearance, shelf life, or disease resistance. Some fruits, such as many citrus varieties and strawberries, are hybrids developed through breeding. Cultivar selection strongly influences taste, texture, and growing characteristics."
+},
+{
+"data": "Sustainability considerations in fruit production\n\nFruit production requires land, water, energy, and transportation. Environmental impact varies depending on farming practices, transportation distance, and storage methods. Reducing food waste, improving packaging efficiency, and supporting sustainable agriculture can help reduce the environmental footprint of fruit supply chains."
+}
+]

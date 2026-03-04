@@ -82,6 +82,9 @@ def generate_query(state: SQLGenerateState):
     # respond naturally when it obtains the solution.
     llm_with_tools = model.bind_tools([run_query_tool])
     response = llm_with_tools.invoke([system_message] + state["messages"])
+    if response.tool_calls:
+        args = response.tool_calls[0]["args"]
+        print("SQL query:", args["query"])
 
     return {"messages": [response]}
 
@@ -151,6 +154,7 @@ agent = builder.compile()
 
 @tool(description="Query the DB to retrieve data")
 def generate_sql(user_prompt: str):
+    print(f"generate_sql({user_prompt}) called.")
     last_message = None
     for step in agent.stream(
             {"messages": [{"role": "user", "content": user_prompt}]},

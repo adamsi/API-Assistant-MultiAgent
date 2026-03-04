@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.core.agent import invoke
+from app.core.supervisor import invoke
 
 router = APIRouter(prefix="/prompt")
 

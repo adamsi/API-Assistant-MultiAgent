@@ -7,5 +7,8 @@ langchain[openai]
 python-dotenv
 pydantic
 pydantic_settings
-pinecone
-langchain_pinecone
+langchain-postgres
+pgvector
+psycopg2
+langchain_community
+requests

@@ -5,8 +5,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     openai_api_key: str = Field(..., alias="OPENAI_API_KEY")
-    pinecone_api_key: str = Field(..., alias="PINECONE_API_KEY")
-    pinecone_index: str = Field("fruits-index", alias="PINECONE_INDEX")
+    gisma_db_url: str = Field(..., alias="GISMA_DB_URL")
+    llm_model: str = Field(..., alias="SA_LLM_MODEL")
+    embeddings_model: str = Field(..., alias= "SA_EMBEDDINGS_MODEL")
+    db_url: str = Field(..., alias="SA_DB_URL")
 
     model_config = SettingsConfigDict(
         env_file=".env",

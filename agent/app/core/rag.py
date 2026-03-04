@@ -1,14 +1,16 @@
 import uuid
 from langchain_openai import OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
 from langchain_core.documents import Document
+from langchain_postgres import PGVector
+
 from app.settings import settings
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+embeddings = OpenAIEmbeddings(model=settings.embeddings_model)
 
-vector_store = PineconeVectorStore(
-    index_name=settings.pinecone_index,
-    embedding=embeddings
+vector_store = PGVector(
+    connection=settings.db_url,
+    embeddings=embeddings,
+    collection_name="document_vector_store"
 )
 
 retriever = vector_store.as_retriever()

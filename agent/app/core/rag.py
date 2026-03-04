@@ -10,7 +10,8 @@ embeddings = OpenAIEmbeddings(model=settings.embeddings_model)
 vector_store = PGVector(
     connection=settings.db_url,
     embeddings=embeddings,
-    collection_name="document_vector_store"
+    collection_name="document_vector_store",
+    create_extension=False
 )
 
 retriever = vector_store.as_retriever()

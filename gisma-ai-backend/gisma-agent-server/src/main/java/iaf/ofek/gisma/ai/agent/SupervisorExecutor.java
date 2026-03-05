@@ -4,20 +4,14 @@ import iaf.ofek.gisma.ai.agent.llmCall.LLMCallerWithMemoryService;
 import iaf.ofek.gisma.ai.agent.memory.ChatMemoryAdvisorProvider;
 import iaf.ofek.gisma.ai.agent.prompt.PromptFormat;
 import iaf.ofek.gisma.ai.agent.rag.RagService;
-import iaf.ofek.gisma.ai.agent.tool.GismaToolCallbackProvider;
 import iaf.ofek.gisma.ai.dto.agent.UserPrompt;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 import java.util.UUID;
-
-import static iaf.ofek.gisma.ai.constant.AdvisorOrder.QA_ADVISOR_ORDER;
 
 @Service
 @Log4j2
@@ -25,8 +19,8 @@ public class SupervisorExecutor {
     private static final String SYSTEM_MESSAGE_TEMPLATE = """
             You are the Gisma API Assistant.
             Answer user queries using documentation (RAG CONTEXT), chat memory, and live data via mcp tools.
-          
-            if the answer requires data fetching or is not in RAG CONTEXT, use mcp tools.
+            if the answer requires data fetching or is not in RAG CONTEXT, you must use mcp tools.
+            Do not use outside knowledge, Do not answer non related questions.
             
             Response format should be Friendly, well-structured style:
             - Use clear formatting and naturally include emojis to enhance readability.
@@ -35,13 +29,11 @@ public class SupervisorExecutor {
             ###RAG CONTEXT###
             {rag_context}
             """;
-    private static final String SUPERVISOR_MCP_TOOL = "generate_sql";
     private final LLMCallerWithMemoryService llmCallerService;
     private final RagService ragService;
 
-    public SupervisorExecutor(ChatClient.Builder builder, ToolCallbackProvider toolCallbackProvider,
+    public SupervisorExecutor(ChatClient.Builder builder, ToolCallbackProvider tools,
                               ChatMemoryAdvisorProvider memoryAdvisorProvider, RagService ragService) {
-        GismaToolCallbackProvider tools = new GismaToolCallbackProvider(toolCallbackProvider, SUPERVISOR_MCP_TOOL);
         this.llmCallerService = new LLMCallerWithMemoryService(builder, tools, memoryAdvisorProvider);
         this.ragService = ragService;
     }

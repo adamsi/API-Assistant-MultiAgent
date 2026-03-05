@@ -10,15 +10,13 @@ from app.tools.generate_sql_graph import generate_sql_
 mcp = FastMCP("gisma-mcp-server")
 
 
-@mcp.tool
-def get_api_fruits(user_request: str):
-    """get fruits from api by user_request filter"""
-    return get_api_fruits_(user_request)
+# @mcp.tool(description="Use this tool only when user_prompt asks specifically to use `get_api_fruits` tool")
+# def get_api_fruits(user_request: str):
+#     return get_api_fruits_(user_request)
 
 
-@mcp.tool
-def generate_sql(user_request: str):
-    """get data from db according to user_request"""
+@mcp.tool(description="get data from db according to user_request")
+def get_gisma_data(user_request: str):
     return generate_sql_(user_request)
 
 

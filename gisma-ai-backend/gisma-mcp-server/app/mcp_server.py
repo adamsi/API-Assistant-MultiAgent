@@ -19,4 +19,4 @@ def generate_sql(user_request: str):
     return generate_sql_(user_request)
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="sse", port=8081)

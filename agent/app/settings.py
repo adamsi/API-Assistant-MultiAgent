@@ -7,7 +7,6 @@ class Settings(BaseSettings):
     openai_api_key: str = Field(..., alias="OPENAI_API_KEY")
     gisma_db_url: str = Field(..., alias="GISMA_DB_URL")
     llm_model: str = Field(..., alias="SA_LLM_MODEL")
-    embeddings_model: str = Field(..., alias= "SA_EMBEDDINGS_MODEL")
     db_url: str = Field(..., alias="SA_DB_URL")
 
     model_config = SettingsConfigDict(

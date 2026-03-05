@@ -3,7 +3,6 @@ from typing import List
 import ast
 
 from langchain_core.messages import AIMessage
-from langchain_core.tools import tool
 from langgraph.constants import START
 
 from langgraph.graph import StateGraph, MessagesState
@@ -82,11 +81,7 @@ builder.add_edge("build_ids_to_fetch", "get_api_entities")
 
 agent = builder.compile()
 
-@tool(description="Get Fruits from API by filter")
-def get_api_fruits(_filter: str):
-    return _get_api_fruits(_filter)
-
-def _get_api_fruits(_filter: str):
+def get_api_fruits_(_filter: str):
     print(f"get_api_fruits({_filter}) called.")
     final_state = agent.invoke({"filter": _filter})
     return final_state["final_entities"]

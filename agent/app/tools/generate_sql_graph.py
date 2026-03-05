@@ -150,12 +150,7 @@ builder.add_edge("run_query", "generate_query")
 
 agent = builder.compile()
 
-
-@tool(description="Query the DB to retrieve data")
-def generate_sql(user_prompt: str):
-    return _generate_sql(user_prompt)
-
-def _generate_sql(user_prompt: str):
+def generate_sql_(user_prompt: str):
     print(f"generate_sql({user_prompt}) called.")
     last_message = None
     for step in agent.stream(

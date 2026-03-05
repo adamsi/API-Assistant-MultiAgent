@@ -1,5 +1,6 @@
+import uuid
+
 from langchain_core.tools import tool
-from langchain.chat_models import init_chat_model
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from typing import Literal
@@ -7,10 +8,8 @@ from langchain.messages import AIMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
+from app.core.model import model
 from app.settings import settings
-
-# LLM Model
-model = init_chat_model(settings.llm_model)
 
 # DB Tools
 db = SQLDatabase.from_uri(settings.gisma_db_url)
@@ -36,7 +35,7 @@ def list_tables(state: SQLGenerateState):
     tool_call = {
         "name": "sql_db_list_tables",
         "args": {},
-        "id": "abc123",
+        "id": str(uuid.uuid4()),
         "type": "tool_call",
     }
     tool_call_message = AIMessage(content="", tool_calls=[tool_call])
@@ -154,6 +153,9 @@ agent = builder.compile()
 
 @tool(description="Query the DB to retrieve data")
 def generate_sql(user_prompt: str):
+    return _generate_sql(user_prompt)
+
+def _generate_sql(user_prompt: str):
     print(f"generate_sql({user_prompt}) called.")
     last_message = None
     for step in agent.stream(
@@ -162,4 +164,3 @@ def generate_sql(user_prompt: str):
     ):
         last_message = step["messages"][-1]
     return last_message.content
-

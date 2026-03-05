@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 from app.core.generate_sql_graph import generate_sql
 from app.core.rag import get_context
-from app.core.api_toolkit import api_toolkit
 from app.settings import settings
 
 
@@ -12,15 +11,13 @@ class Response(BaseModel):
     answer: str
 
 agent = create_agent(model=settings.llm_model,
-                     tools=[*api_toolkit, generate_sql])
+                     tools=[generate_sql])
 
 SYSTEM_TEMPLATE = """
 You are a helpful Fruits API assistant.
-Use the provided RAG REFERENCE and available tools to answer accurately.
-
-Tool rules:
-- If there is a **100% semantic match** between the user request and one of the API tools, use that API tool.
-- If there is **no exact match** with any API tool capability, you MUST use the `generate_sql` tool to retrieve the data from the database.
+Use the 'generate_sql` tool for any data request (retrieves data from the database).
+Use RAG REFERENCE for documentation or general questions.
+never invent information.
 
 RAG REFERENCE:
 {context}

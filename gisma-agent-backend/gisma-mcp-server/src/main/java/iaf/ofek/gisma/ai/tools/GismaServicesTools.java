@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -19,8 +21,9 @@ public class GismaServicesTools {
 
     @Tool(description = "Get gisma data by user prompt")
     public String getGismaData(String prompt) {
-        return webClient.get()
+        return webClient.post()
                 .uri("/data")
+                .bodyValue(Map.of("prompt", prompt))
                 .retrieve()
                 .bodyToMono(String.class)
                 .onErrorReturn("Could not fetch data due to unexcepted error")

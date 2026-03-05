@@ -1,14 +1,12 @@
 langgraph
 langchain-core
 langchain-openai
-fastapi
-uvicorn
+fastmcp
 langchain[openai]
 python-dotenv
 pydantic
 pydantic_settings
 langchain-postgres
-pgvector
 psycopg2
 langchain_community
 requests

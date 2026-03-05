@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/prompt")
 
 class PromptRequest(BaseModel):
     prompt:str
-    mode:Literal["api"]|None
+    mode:Optional[Literal["api","db"]] = None
 
 @router.post("")
 def handle_prompt(request: PromptRequest):

@@ -32,7 +32,7 @@ public class SupervisorExecutor {
             - Use clear formatting and naturally include emojis to enhance readability.
             - When returning fetched or structured data, present it in a well-formatted table.
             
-            ### RAG CONTEXT ###
+            ###RAG CONTEXT###
             {rag_context}
             """;
     private static final String SUPERVISOR_MCP_TOOL = "generate_sql";

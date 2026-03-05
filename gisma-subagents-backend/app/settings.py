@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     openai_api_key: str = Field(..., alias="OPENAI_API_KEY")
     llm_model: str = Field(..., alias="SA_LLM_MODEL")
-    db_url: str = Field(..., alias="SA_DB_URL")
+    gisma_db_url: str = Field(..., alias="GISMA_DB_URL")
 
     model_config = SettingsConfigDict(
         env_file=".env",

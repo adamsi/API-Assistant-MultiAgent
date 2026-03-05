@@ -3,13 +3,11 @@ from typing import List
 import ast
 
 from langchain_core.messages import AIMessage
-from langchain_core.tools import tool
 from langgraph.constants import START
-
 from langgraph.graph import StateGraph, MessagesState
 
-from app.core.api_toolkit import _get_fruit_by_name
-from app.core.generate_sql_graph import _generate_sql
+from app.core.api_toolkit import get_fruit_by_name
+from app.core.generate_sql_graph import generate_sql
 from app.core.model import model
 
 gisma_primary_key = "name"
@@ -29,7 +27,7 @@ def generate_db_ids(state: ApiFruitsState):
     }
     tool_call_message = AIMessage(content="", tool_calls=[tool_call])
     sql_generate_prompt = f"get {gisma_primary_key} column of fruits which {state['filter']}"
-    sql_generate_response = _generate_sql(sql_generate_prompt)
+    sql_generate_response = generate_sql(sql_generate_prompt)
     tool_message = AIMessage(content=sql_generate_response)
 
     return {"messages": [tool_call_message, tool_message]}
@@ -68,7 +66,7 @@ def parse_ids_list(ids_list: str):
     return []
 
 def get_api_entities(state: ApiFruitsState):
-    entities = [_get_fruit_by_name(_id) for _id in state["ids_to_fetch"]]
+    entities = [get_fruit_by_name(_id) for _id in state["ids_to_fetch"]]
     return {"final_entities": entities}
 
 builder = StateGraph(ApiFruitsState)

@@ -1,9 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-
-from core.generate_sql_graph import generate_sql
-from core.get_api_fruits_graph import get_api_fruits
+from app.core.generate_sql_graph import generate_sql
+from app.core.get_api_fruits_graph import get_api_fruits
 
 router = APIRouter(prefix="/prompt")
 

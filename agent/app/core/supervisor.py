@@ -15,9 +15,9 @@ agent = create_agent(model=settings.llm_model,
 
 SYSTEM_TEMPLATE = """
 You are a helpful Fruits API assistant.
-Use the 'generate_sql` tool for any data request (retrieves data from the database).
-Use RAG REFERENCE for documentation or general questions.
-never invent information.
+if the answer requires data fetching or is not in RAG REFERENCE
+call 'generate_sql` tool (retrieves data from the database).
+if you're not sure, call 'generate_sql' tool.
 
 RAG REFERENCE:
 {context}

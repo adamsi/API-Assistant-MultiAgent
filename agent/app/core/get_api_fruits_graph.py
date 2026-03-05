@@ -4,6 +4,7 @@ import ast
 
 from langchain_core.messages import AIMessage
 from langchain_core.tools import tool
+from langgraph.constants import START
 
 from langgraph.graph import StateGraph, MessagesState
 
@@ -27,8 +28,9 @@ def generate_db_ids(state: ApiFruitsState):
         "type": "tool_call",
     }
     tool_call_message = AIMessage(content="", tool_calls=[tool_call])
-    sql_generate_prompt = f"get {gisma_primary_key} column of fruits which {state["filter"]}"
-    tool_message = _generate_sql(sql_generate_prompt)
+    sql_generate_prompt = f"get {gisma_primary_key} column of fruits which {state['filter']}"
+    sql_generate_response = _generate_sql(sql_generate_prompt)
+    tool_message = AIMessage(content=sql_generate_response)
 
     return {"messages": [tool_call_message, tool_message]}
 
@@ -52,9 +54,9 @@ def build_ids_to_fetch(state: ApiFruitsState):
     free_text_ids = state["messages"][-1].content
     system_message = {"role": "system", "content": build_ids_to_fetch_system_prompt}
     user_message = {"role": "user", "content": free_text_ids}
-    response = model.invoke([user_message, system_message])
-    ids_to_fetch = parse_ids_list(response)
-    return {"message":[response], "ids_to_fetch": ids_to_fetch}
+    response = model.invoke([system_message, user_message])
+    ids_to_fetch = parse_ids_list(response.content)
+    return {"messages":[response], "ids_to_fetch": ids_to_fetch}
 
 def parse_ids_list(ids_list: str):
     try:
@@ -74,13 +76,17 @@ builder.add_node(generate_db_ids)
 builder.add_node(build_ids_to_fetch)
 builder.add_node(get_api_entities)
 
-builder.add_edge(generate_db_ids, build_ids_to_fetch)
-builder.add_edge(build_ids_to_fetch, get_api_entities)
+builder.add_edge(START, "generate_db_ids")
+builder.add_edge("generate_db_ids", "build_ids_to_fetch")
+builder.add_edge("build_ids_to_fetch", "get_api_entities")
 
 agent = builder.compile()
 
 @tool(description="Get Fruits from API by filter")
 def get_api_fruits(_filter: str):
+    return _get_api_fruits(_filter)
+
+def _get_api_fruits(_filter: str):
     print(f"get_api_fruits({_filter}) called.")
-    final_state = agent.invoke({"filter": filter})
+    final_state = agent.invoke({"filter": _filter})
     return final_state["final_entities"]

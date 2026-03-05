@@ -1,6 +1,6 @@
 package iaf.ofek.gisma.ai;
 
-import iaf.ofek.gisma.ai.service.tools.GismaServicesTools;
+import iaf.ofek.gisma.ai.tools.GismaServicesTools;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;

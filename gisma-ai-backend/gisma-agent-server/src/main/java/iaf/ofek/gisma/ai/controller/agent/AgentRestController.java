@@ -17,7 +17,6 @@ import java.util.UUID;
 @Log4j2
 @RequiredArgsConstructor
 public class AgentRestController {
-
     private final SupervisorExecutor supervisorExecutor;
 
     @PostMapping
@@ -29,5 +28,4 @@ public class AgentRestController {
 
         return response;
     }
-
 }

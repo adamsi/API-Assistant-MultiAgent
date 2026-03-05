@@ -22,11 +22,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Validated
 public class AuthController {
-
     private final AuthService authService;
-
     private final CookieUtil cookieUtil;
-
     private final UserService userService;
 
     @PostMapping("/login")
@@ -73,6 +70,4 @@ public class AuthController {
 
         return ResponseEntity.ok(user);
     }
-
-
 }

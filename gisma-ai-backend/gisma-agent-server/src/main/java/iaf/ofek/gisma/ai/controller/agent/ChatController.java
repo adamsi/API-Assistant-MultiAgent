@@ -20,11 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Log4j2
 public class ChatController {
-
     private final SimpMessagingTemplate messagingTemplate;
-
     private final SupervisorExecutor supervisorExecutor;
-
     private final ChatMemoryService chatMemoryService;
 
     //client sends request to /app/chat and listens to response on /user/queue/reply,
@@ -69,5 +66,4 @@ public class ChatController {
                 })
                 .then();
     }
-
 }

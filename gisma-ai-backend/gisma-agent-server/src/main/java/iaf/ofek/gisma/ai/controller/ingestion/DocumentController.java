@@ -23,7 +23,6 @@ import java.util.UUID;
 @Validated
 @Log4j2
 public class DocumentController {
-
     private final DocumentProcessor documentProcessor;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -45,7 +44,6 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.OK).body(document);
     }
 
-
     @DeleteMapping
     public ResponseEntity<?> delete(@RequestBody List<UUID> ids) {
         documentProcessor.deleteDocuments(ids);
@@ -53,5 +51,4 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
-
 }

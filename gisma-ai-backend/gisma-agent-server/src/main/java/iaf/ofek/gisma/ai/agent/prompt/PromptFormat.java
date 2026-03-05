@@ -6,11 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class PromptFormat {
-
-    public static final String SCHEMA_JSON = "{schema_json}";
-
-    public static final String QUERY = "{query}";
-
-    public static final String RESPONSE_FORMAT = "{response_format}";
+    public static final String RAG_CONTEXT = "{rag_context}";
 
 }

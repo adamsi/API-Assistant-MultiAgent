@@ -22,9 +22,7 @@ import java.util.UUID;
 @AdminOnly
 @Validated
 public class FolderController {
-
     private final FolderService folderService;
-
     private final ParentFolderFetcherService folderFetcherService;
 
     @GetMapping
@@ -46,5 +44,4 @@ public class FolderController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
-
 }

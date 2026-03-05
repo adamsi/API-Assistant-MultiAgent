@@ -15,7 +15,6 @@ import java.util.UUID;
 @RequestMapping("/chat-memory")
 @RequiredArgsConstructor
 public class ChatMemoryController {
-
     private final ChatMemoryService chatMemoryService;
 
     @GetMapping
@@ -36,5 +35,4 @@ public class ChatMemoryController {
 
         return ResponseEntity.noContent().build();
     }
-
 }

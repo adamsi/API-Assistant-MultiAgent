@@ -1,6 +1,5 @@
 import uuid
 
-from langchain_core.tools import tool
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from typing import Literal
@@ -8,8 +7,8 @@ from langchain.messages import AIMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
-from app.core.model import model
-from app.settings import settings
+from model import model
+from settings import settings
 
 # DB Tools
 db = SQLDatabase.from_uri(settings.gisma_db_url)

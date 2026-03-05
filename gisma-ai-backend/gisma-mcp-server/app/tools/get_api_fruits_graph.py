@@ -7,9 +7,9 @@ from langgraph.constants import START
 
 from langgraph.graph import StateGraph, MessagesState
 
-from api_toolkit import get_fruit_by_name
-from generate_sql_graph import generate_sql_
-from model import model
+from app.tools.api_toolkit import get_fruit_by_name
+from app.tools.generate_sql_graph import generate_sql_
+from app.tools.model import model
 
 gisma_primary_key = "name"
 

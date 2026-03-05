@@ -1,7 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastmcp import FastMCP
 
-from tools.get_api_fruits_graph import get_api_fruits_
-from tools.generate_sql_graph import generate_sql_
+from app.tools.get_api_fruits_graph import get_api_fruits_
+from app.tools.generate_sql_graph import generate_sql_
 
 mcp = FastMCP("gisma-mcp-server")
 

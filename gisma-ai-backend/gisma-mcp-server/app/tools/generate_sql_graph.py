@@ -7,8 +7,8 @@ from langchain.messages import AIMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 
-from model import model
-from settings import settings
+from app.tools.model import model
+from app.settings import settings
 
 # DB Tools
 db = SQLDatabase.from_uri(settings.gisma_db_url)

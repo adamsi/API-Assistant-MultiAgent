@@ -1,6 +1,6 @@
 package iaf.ofek.gisma.ai;
 
-import iaf.ofek.gisma.ai.tools.GismaServicesTools;
+import iaf.ofek.gisma.ai.tools.SubagentsTools;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
@@ -15,9 +15,9 @@ public class GismaMcpServer {
     }
 
     @Bean
-    public ToolCallbackProvider tools(GismaServicesTools gismaServicesTools) {
+    public ToolCallbackProvider tools(SubagentsTools subagentsTools) {
         return MethodToolCallbackProvider.builder()
-                .toolObjects(gismaServicesTools)
+                .toolObjects(subagentsTools)
                 .build();
     }
 

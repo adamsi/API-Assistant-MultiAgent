@@ -4,7 +4,6 @@ import iaf.ofek.gisma.ai.agent.SupervisorExecutor;
 import iaf.ofek.gisma.ai.dto.agent.PromptRequest;
 import iaf.ofek.gisma.ai.dto.agent.PromptResponse;
 import iaf.ofek.gisma.ai.dto.agent.UserPrompt;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,20 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/prompt")
 @Log4j2
-@RequiredArgsConstructor
 public class AgentRestController {
-    @Value("${gisma.subagents_server.url}")
-    private String subagentsServerUrl;
-
-    private final WebClient webClient = WebClient.create(subagentsServerUrl);
-
+    private final WebClient webClient;
     private final SupervisorExecutor supervisorExecutor;
 
+    public AgentRestController(SupervisorExecutor supervisorExecutor, @Value("${gisma.subagents_server.url}") String subagentsServerUrl) {
+        this.supervisorExecutor = supervisorExecutor;
+        this.webClient = WebClient.create(subagentsServerUrl);
+    }
 
     @PostMapping("/data")
     public PromptResponse handleDataPrompt(@RequestBody UserPrompt prompt) {

@@ -39,7 +39,7 @@ public class SupervisorExecutor {
     }
 
     private Flux<String> execute(UserPrompt userPrompt, String chatId) {
-        String query = userPrompt.query();
+        String query = userPrompt.prompt();
         String systemMessage = SYSTEM_MESSAGE_TEMPLATE.replace(PromptFormat.RAG_CONTEXT, ragService.getContext(query));
         return llmCallerService.callLLM(chatClient -> chatClient.prompt()
                 .system(systemMessage)
@@ -51,7 +51,7 @@ public class SupervisorExecutor {
     }
 
     private String executeBlocking(UserPrompt userPrompt, String chatId) {
-        String query = userPrompt.query();
+        String query = userPrompt.prompt();
         String systemMessage = SYSTEM_MESSAGE_TEMPLATE.replace(PromptFormat.RAG_CONTEXT, ragService.getContext(query));
         return llmCallerService.callLLMBlocking(chatClient -> chatClient.prompt()
                 .system(systemMessage)

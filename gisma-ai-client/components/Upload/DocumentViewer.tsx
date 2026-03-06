@@ -248,7 +248,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         </div>
 
         {/* Content Area - Full Editor View */}
-        <div className="flex-1 bg-gradient-to-br from-gray-800/50 via-gray-700/40 to-gray-800/50 min-h-0 overflow-auto relative">
+        <div className="flex-1 bg-gradient-to-br from-gray-800/50 via-gray-700/40 to-gray-800/50 min-h-0 overflow-hidden relative">
           {renderContent()}
         </div>
       </div>

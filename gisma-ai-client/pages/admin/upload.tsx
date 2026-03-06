@@ -548,12 +548,12 @@ const AdminUpload: React.FC = () => {
               </div>
 
             {/* File System Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 min-w-0">
               {/* Folders */}
               {currentFolder.childrenFolders?.map((folder) => (
                 <div
                   key={folder.id}
-                  className={`group relative bg-black/30 backdrop-blur-xl rounded-2xl p-4 border transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10 ${
+                  className={`group relative min-w-0 bg-black/30 backdrop-blur-xl rounded-2xl p-4 border transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10 ${
                     selectedItems.includes(folder.id)
                       ? 'border-blue-400/50 bg-blue-500/10'
                       : 'border-white/10 hover:border-blue-400/30'
@@ -567,12 +567,12 @@ const AdminUpload: React.FC = () => {
                   }}
                   onContextMenu={(e) => handleContextMenu(e, folder.id, 'folder')}
                 >
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center group-hover:from-blue-500/30 group-hover:to-indigo-500/30 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center space-y-3 w-full min-w-0">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center group-hover:from-blue-500/30 group-hover:to-indigo-500/30 transition-all duration-300 flex-shrink-0">
                       <IconFolder className="w-6 h-6 text-blue-400" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-white truncate group-hover:text-blue-200 transition-colors duration-200">
+                    <div className="flex-1 min-w-0 w-full overflow-hidden">
+                      <h3 className="text-sm font-medium text-white truncate group-hover:text-blue-200 transition-colors duration-200" title={folder.name}>
                         {folder.name}
                       </h3>
                       <p className="text-xs text-blue-200/60 mt-1">
@@ -594,7 +594,7 @@ const AdminUpload: React.FC = () => {
               {currentFolder.childrenDocuments?.map((document) => (
                 <div
                   key={document.id}
-                  className={`group relative bg-black/30 backdrop-blur-xl rounded-2xl p-4 border transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10 ${
+                  className={`group relative min-w-0 bg-black/30 backdrop-blur-xl rounded-2xl p-4 border transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-blue-500/10 ${
                     selectedItems.includes(document.id)
                       ? 'border-blue-400/50 bg-blue-500/10'
                       : 'border-white/10 hover:border-blue-400/30'
@@ -608,12 +608,12 @@ const AdminUpload: React.FC = () => {
                   }}
                   onContextMenu={(e) => handleContextMenu(e, document.id, 'file')}
                 >
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-gray-500/20 to-gray-600/20 rounded-xl flex items-center justify-center group-hover:from-gray-500/30 group-hover:to-gray-600/30 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center space-y-3 w-full min-w-0">
+                    <div className="w-12 h-12 bg-gradient-to-br from-gray-500/20 to-gray-600/20 rounded-xl flex items-center justify-center group-hover:from-gray-500/30 group-hover:to-gray-600/30 transition-all duration-300 flex-shrink-0">
                       {getFileIcon(document.contentType)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-white truncate group-hover:text-blue-200 transition-colors duration-200">
+                    <div className="flex-1 min-w-0 w-full overflow-hidden">
+                      <h3 className="text-sm font-medium text-white truncate group-hover:text-blue-200 transition-colors duration-200" title={document.name}>
                         {document.name}
                       </h3>
                     </div>

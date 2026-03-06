@@ -50,7 +50,7 @@ public class ChatMemoryService {
     }
 
     public Mono<ChatStartResponse> createChat(ChatStartRequest chatStartRequest, UUID userId) {
-        return chatDescriptionGenerator.generateDescription(chatStartRequest.query())
+        return chatDescriptionGenerator.generateDescription(chatStartRequest.prompt())
                 .flatMap(description ->
                         runBlockingCallableAsync(() -> {
                             String finalDescription = StringUtils.stripWrappers(description);

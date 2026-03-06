@@ -55,7 +55,7 @@ public class ChatController {
                             messagingTemplate.convertAndSendToUser(userId, "/queue/metadata", chatStartResponse)
                     );
                     Flux<Void> responses = supervisorExecutor.handleQuery(
-                                    new UserPrompt(chatStart.query(), chatId),
+                                    new UserPrompt(chatStart.prompt(), chatId),
                                     chatId
                             )
                             .concatMap(response -> Mono.fromRunnable(() ->

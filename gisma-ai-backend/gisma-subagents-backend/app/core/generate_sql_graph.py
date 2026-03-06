@@ -82,6 +82,7 @@ def generate_query(state: SQLGenerateState):
     llm_with_tools = model.bind_tools([run_query_tool])
     response = llm_with_tools.invoke([system_message] + state["messages"])
     if response.tool_calls:
+        print(response.tool_calls.__len__())
         args = response.tool_calls[0]["args"]
         print("SQL query:", args["query"])
 

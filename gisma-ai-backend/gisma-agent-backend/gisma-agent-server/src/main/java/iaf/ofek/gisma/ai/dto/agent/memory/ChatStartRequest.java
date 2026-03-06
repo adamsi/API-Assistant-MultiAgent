@@ -1,4 +1,4 @@
 package iaf.ofek.gisma.ai.dto.agent.memory;
 
-public record ChatStartRequest(String query) {
+public record ChatStartRequest(String prompt) {
 }

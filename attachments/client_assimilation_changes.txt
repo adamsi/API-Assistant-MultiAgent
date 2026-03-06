@@ -1,0 +1,1 @@
+- Change `query` to `prompt` in websocket messaging.

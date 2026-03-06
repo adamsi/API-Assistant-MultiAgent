@@ -72,7 +72,7 @@ export const Chatbar: FC<Props> = ({
 
   return (
     <div
-      className={`fixed top-0 bottom-0 z-50 flex h-full w-[260px] flex-none flex-col bg-white/5 backdrop-blur-2xl border-r border-white/10 shadow-2xl transition-all duration-apple sm:relative sm:top-0 space-y-3 p-4`}
+      className={`fixed top-0 bottom-0 z-50 flex h-full w-[300px] flex-none flex-col bg-white/5 backdrop-blur-2xl border-r border-white/10 shadow-2xl transition-all duration-apple sm:relative sm:top-0 space-y-3 p-4`}
     >
       <div className="flex items-center">
         <button

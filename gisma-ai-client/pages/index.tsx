@@ -330,7 +330,7 @@ const Home: React.FC = () => {
                 chatsLoading={chatsLoading}
               />
                 <button
-                  className={`fixed top-2.5 left-[270px] z-50 h-7 w-7 sm:top-0.5 sm:left-[270px] sm:h-8 sm:w-8 transition-colors ${
+                  className={`fixed top-2.5 left-[310px] z-50 h-7 w-7 sm:top-0.5 sm:left-[310px] sm:h-8 sm:w-8 transition-colors ${
                     lightMode === 'light'
                       ? 'text-gray-700 hover:text-gray-900'
                       : 'text-white hover:text-gray-300'

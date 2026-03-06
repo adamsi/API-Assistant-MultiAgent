@@ -1,6 +1,5 @@
 package iaf.ofek.gisma.ai.tools;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +19,14 @@ public class SubagentsTools {
         this.webClient = WebClient.create(subagentsServerUrl);
     }
 
-    @Tool(description = "Get gisma data by user prompt")
-    public String getGismaData(String prompt) {
+    @Tool(description = "handle user original prompt")
+    public String handleUserOriginalPrompt(String userOriginalPrompt) {
+        log.info("generateSql called. userOriginalPrompt: {}.", userOriginalPrompt);
+
         return webClient.post()
                 .uri("/data")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("prompt", prompt))
+                .bodyValue(Map.of("prompt", userOriginalPrompt))
                 .retrieve()
                 .bodyToMono(String.class)
                 .doOnError(Throwable::printStackTrace)

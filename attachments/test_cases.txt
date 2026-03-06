@@ -1,72 +1,29 @@
-FRUITS AGENT TEST CASES WITH EXPECTED ANSWERS
+Q: How many fruits are in the database?
+A: 10
 
-1. User: Give me all fruits.
-Expected answer:
-Return a list of all fruit entities from the API/DB.
-Example:
-[
-  { "id": 1, "name": "Apple", "family": "Rosaceae", "color": "Red" },
-  { "id": 2, "name": "Banana", "family": "Musaceae", "color": "Yellow" },
-  ...
-]
+Q: Which fruits belong to the Rosaceae family?
+A: apple, pear, strawberry
 
-2. User: Give me the fruit with name apple.
-Expected answer:
-Return the full fruit entity for Apple.
-Example:
-{ "id": 1, "name": "Apple", "family": "Rosaceae", "color": "Red" }
+Q: Which fruits have a tropical climate?
+A: banana, mango, pineapple
 
-3. User: Show me fruits with green color.
-Expected answer:
-Return full fruit entities whose color is green.
-Example:
-[
-  { "id": 7, "name": "Green Apple", "family": "Rosaceae", "color": "Green" },
-  { "id": 9, "name": "Kiwi", "family": "Actinidiaceae", "color": "Green" }
-]
+Q: What is the average weight of all fruits?
+A: 206.0 g
 
-4. User: List fruits in the same family as apple.
-Expected answer:
-First resolve Apple’s family, then return all fruits in that family.
-Example:
-[
-  { "id": 1, "name": "Apple", "family": "Rosaceae", "color": "Red" },
-  { "id": 5, "name": "Pear", "family": "Rosaceae", "color": "Green" },
-  { "id": 8, "name": "Quince", "family": "Rosaceae", "color": "Yellow" }
-]
+Q: Which fruit has the highest sweetness_brix?
+A: grape (16.0)
 
-5. User: Give me the names of fruits in the same family as apple.
-Expected answer:
-Return only the names, not full entities.
-Example:
-["Apple", "Pear", "Quince"]
+Q: Which fruits are hybrids?
+A: strawberry, orange, lemon
 
-6. User: How many fruits are there?
-Expected answer:
-Return a count only.
-Example:
-There are 24 fruits.
+Q: Which fruits are available in Israel?
+A: apple
 
-7. User: How many green fruits are there?
-Expected answer:
-Return count of fruits where color is green.
-Example:
-There are 6 green fruits.
+Q: Which cultivars belong to apple?
+A: Granny Smith, Gala
 
-8. User: Give me only the names of all fruits.
-Expected answer:
-Return a list of names only.
-Example:
-["Apple", "Banana", "Orange", "Kiwi"]
+Q: Which fruit is linked to latex-fruit syndrome?
+A: banana
 
-9. User: Give me ids of fruits with yellow color.
-Expected answer:
-Return ids only.
-Example:
-[2, 6, 11]
-
-10. User: What colors exist in the fruits dataset?
-Expected answer:
-Return distinct colors only.
-Example:
-["Red", "Green", "Yellow", "Orange", "Purple"]
+Q: Which fruit pairs well with pineapple?
+A: mango

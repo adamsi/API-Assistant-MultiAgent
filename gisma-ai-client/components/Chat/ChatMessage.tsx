@@ -1,6 +1,10 @@
 import { Conversation, Message } from '@/types/chat';
 import { IconCheck, IconCopy, IconUser, IconRobot, IconRepeat } from '@tabler/icons-react';
 import { FC, memo, useState } from 'react';
+import remarkGfm from 'remark-gfm';
+import { MemoizedReactMarkdown } from '@/components/Markdown/MemoizedReactMarkdown';
+import { extractMarkdownPipeTables } from '@/utils/markdownPipeTables';
+import { MarkdownTableBlock } from './MarkdownTableBlock';
 
 interface Props {
   message: Message;
@@ -85,10 +89,29 @@ export const ChatMessage: FC<Props> = memo(
                 </div>
 
                 <div 
-                  className="prose whitespace-pre-wrap dark:prose-invert"
+                  className="prose dark:prose-invert"
                   style={{ direction: textDirection }}
                 >
-                  {message.content}
+                  {extractMarkdownPipeTables(message.content).map((part, idx) => {
+                    if (part.type === 'table') {
+                      return (
+                        <MarkdownTableBlock
+                          key={`table-${idx}`}
+                          data={part.data}
+                          filenameBase={`assistant-table-${messageIndex + 1}-${idx + 1}`}
+                        />
+                      );
+                    }
+
+                    return (
+                      <MemoizedReactMarkdown
+                        key={`text-${idx}`}
+                        remarkPlugins={[remarkGfm]}
+                      >
+                        {part.value}
+                      </MemoizedReactMarkdown>
+                    );
+                  })}
                 </div>
               </>
             )}

@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.core.generate_sql_graph import generate_sql
-from app.core.get_api_fruits_graph import get_api_fruits
+from app.core.plan_and_execute import plan_and_execute
+from app.core.todo.get_api_entities_graph import get_api_entities
 
 router = APIRouter(prefix="/prompt")
 
@@ -11,8 +11,8 @@ class PromptRequest(BaseModel):
 
 @router.post("/data")
 def handle_data_prompt(request: PromptRequest):
-      return generate_sql(request.prompt)
+      return plan_and_execute(request.prompt)
 
 @router.post("/fruits")
 def handle_fruits_prompt(request: PromptRequest):
-    return get_api_fruits(request.prompt)
+    return get_api_entities(request.prompt)

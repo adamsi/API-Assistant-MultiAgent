@@ -6,7 +6,7 @@ from langchain_core.messages import AIMessage
 from langgraph.constants import START
 from langgraph.graph import StateGraph, MessagesState
 
-from app.core.api_toolkit import get_fruit_by_name
+from app.core.todo.api_toolkit import get_entity_by_name
 from app.core.generate_sql_graph import generate_sql
 from app.core.model import model
 
@@ -66,7 +66,7 @@ def parse_ids_list(ids_list: str):
     return []
 
 def get_api_entities(state: ApiFruitsState):
-    entities = [get_fruit_by_name(_id) for _id in state["ids_to_fetch"]]
+    entities = [get_entity_by_name(_id) for _id in state["ids_to_fetch"]]
     return {"final_entities": entities}
 
 builder = StateGraph(ApiFruitsState)
@@ -80,7 +80,7 @@ builder.add_edge("build_ids_to_fetch", "get_api_entities")
 
 agent = builder.compile()
 
-def get_api_fruits(_filter: str):
+def get_api_entities(_filter: str):
     print(f"get_api_fruits({_filter}) called.")
     final_state = agent.invoke({"filter": _filter})
     return final_state["final_entities"]

@@ -1,37 +1,63 @@
 import uuid
-
-from langchain_core.tools import tool
-from langchain_community.utilities import SQLDatabase
-from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from typing import Literal
+
+from langchain_community.agent_toolkits import SQLDatabaseToolkit
+from langchain_community.utilities import SQLDatabase
 from langchain.messages import AIMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
-from langgraph.prebuilt import ToolNode
 
+from app.core.microservices_catalog import MICROSERVICES_CATALOG
 from app.core.model import model
-from app.settings import settings
 
-# DB Tools
-db = SQLDatabase.from_uri(settings.gisma_db_url)
-db_toolkit = SQLDatabaseToolkit(db=db, llm=model)
-db_tools = db_toolkit.get_tools()
 
-for db_tool in db_tools:
-    print(f"{db_tool.name}: {db_tool.description}\n")
+# Per-microservice DB initialization
+DBS_BY_SERVICE: dict[str, SQLDatabase] = {}
+DB_TOOLKITS_BY_SERVICE: dict[str, SQLDatabaseToolkit] = {}
+DB_TOOLS_BY_SERVICE: dict[str, list] = {}
+
+LIST_TABLES_TOOL_BY_SERVICE = {}
+GET_SCHEMA_TOOL_BY_SERVICE = {}
+RUN_QUERY_TOOL_BY_SERVICE = {}
+
+print("--- MICROSERVICES ---")
+for service_name, service_config in MICROSERVICES_CATALOG.items():
+    db = SQLDatabase.from_uri(service_config["db_url"])
+    db_toolkit = SQLDatabaseToolkit(db=db, llm=model)
+    db_tools = db_toolkit.get_tools()
+
+    DBS_BY_SERVICE[service_name] = db
+    DB_TOOLKITS_BY_SERVICE[service_name] = db_toolkit
+    DB_TOOLS_BY_SERVICE[service_name] = db_tools
+
+    LIST_TABLES_TOOL_BY_SERVICE[service_name] = next(
+        tool for tool in db_tools if tool.name == "sql_db_list_tables"
+    )
+    GET_SCHEMA_TOOL_BY_SERVICE[service_name] = next(
+        tool for tool in db_tools if tool.name == "sql_db_schema"
+    )
+    RUN_QUERY_TOOL_BY_SERVICE[service_name] = next(
+        tool for tool in db_tools if tool.name == "sql_db_query"
+    )
+
+    print(f"\n=== {service_name} ===")
 
 
 # Graph shared state
 class SQLGenerateState(MessagesState):
-    ...
+    microservice_name: str
 
-get_schema_tool = next(tool for tool in db_tools if tool.name == "sql_db_schema")
-get_schema_node = ToolNode([get_schema_tool], name="get_schema")
 
-run_query_tool = next(tool for tool in db_tools if tool.name == "sql_db_query")
-run_query_node = ToolNode([run_query_tool], name="run_query") # executes tool and adds output to messages[]
+def get_service_name(state: SQLGenerateState) -> str:
+    service_name = state["microservice_name"]
+    if service_name not in MICROSERVICES_CATALOG:
+        raise ValueError(f"Unknown microservice: {service_name}")
+    return service_name
 
 
 def list_tables(state: SQLGenerateState):
+    service_name = get_service_name(state)
+    list_tables_tool = LIST_TABLES_TOOL_BY_SERVICE[service_name]
+
     tool_call = {
         "name": "sql_db_list_tables",
         "args": {},
@@ -40,19 +66,31 @@ def list_tables(state: SQLGenerateState):
     }
     tool_call_message = AIMessage(content="", tool_calls=[tool_call])
 
-    list_tables_tool = next(tool for tool in db_tools if tool.name == "sql_db_list_tables")
     tool_message = list_tables_tool.invoke(tool_call)
-    response = AIMessage(f"Available tables: {tool_message.content}")
+    response = AIMessage(content=f"Available tables: {tool_message.content}")
 
     return {"messages": [tool_call_message, tool_message, response]}
 
 
-# Force model to call get_schema (to add to LLM message history)
 def call_get_schema(state: SQLGenerateState):
+    service_name = get_service_name(state)
+    get_schema_tool = GET_SCHEMA_TOOL_BY_SERVICE[service_name]
+
     llm_with_tools = model.bind_tools([get_schema_tool], tool_choice="any")
     response = llm_with_tools.invoke(state["messages"])
 
     return {"messages": [response]}
+
+
+def get_schema(state: SQLGenerateState):
+    service_name = get_service_name(state)
+    get_schema_tool = GET_SCHEMA_TOOL_BY_SERVICE[service_name]
+
+    last_message = state["messages"][-1]
+    tool_call = last_message.tool_calls[0]
+    tool_message = get_schema_tool.invoke(tool_call)
+
+    return {"messages": [tool_message]}
 
 
 generate_query_system_prompt = """
@@ -66,24 +104,28 @@ You can order the results by a relevant column to return the most interesting
 examples in the database.
 
 DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
-""".format(
-    dialect=db.dialect,
-    top_k=100,
-)
+"""
 
 
 def generate_query(state: SQLGenerateState):
+    service_name = get_service_name(state)
+    run_query_tool = RUN_QUERY_TOOL_BY_SERVICE[service_name]
+    db = DBS_BY_SERVICE[service_name]
+
     system_message = {
         "role": "system",
-        "content": generate_query_system_prompt,
+        "content": generate_query_system_prompt.format(
+            dialect=db.dialect,
+            top_k=100,
+        ),
     }
-    # We do not force a tool call here, to allow the model to
-    # respond naturally when it obtains the solution.
+
     llm_with_tools = model.bind_tools([run_query_tool])
     response = llm_with_tools.invoke([system_message] + state["messages"])
+
     if response.tool_calls:
         args = response.tool_calls[0]["args"]
-        print("SQL query:", args["query"])
+        print(f"[{service_name}] SQL query: {args['query']}")
 
     return {"messages": [response]}
 
@@ -101,61 +143,86 @@ If there are any of the above mistakes, rewrite the query. If there are no mista
 just reproduce the original query.
 
 You will call the appropriate tool to execute the query after running this check.
-""".format(dialect=db.dialect)
+"""
 
 
 def check_query(state: SQLGenerateState):
+    service_name = get_service_name(state)
+    run_query_tool = RUN_QUERY_TOOL_BY_SERVICE[service_name]
+    db = DBS_BY_SERVICE[service_name]
+
     system_message = {
         "role": "system",
-        "content": check_query_system_prompt,
+        "content": check_query_system_prompt.format(dialect=db.dialect),
     }
 
-    # Generate an artificial user message to check
     tool_call = state["messages"][-1].tool_calls[0]
     user_message = {"role": "user", "content": tool_call["args"]["query"]}
+
     llm_with_tools = model.bind_tools([run_query_tool], tool_choice="any")
     response = llm_with_tools.invoke([system_message, user_message])
     response.id = state["messages"][-1].id
 
     return {"messages": [response]}
 
+
+def run_query(state: SQLGenerateState):
+    service_name = get_service_name(state)
+    run_query_tool = RUN_QUERY_TOOL_BY_SERVICE[service_name]
+
+    last_message = state["messages"][-1]
+    tool_call = last_message.tool_calls[0]
+    tool_message = run_query_tool.invoke(tool_call)
+
+    return {"messages": [tool_message]}
+
+
 def should_continue(state: SQLGenerateState) -> Literal[END, "check_query"]:
     messages = state["messages"]
     last_message = messages[-1]
     if not last_message.tool_calls:
         return END
-    else:
-        return "check_query"
+    return "check_query"
 
-# Nodes
+
+# Graph
 builder = StateGraph(SQLGenerateState)
-builder.add_node(list_tables)
-builder.add_node(call_get_schema)
-builder.add_node(get_schema_node, "get_schema")
-builder.add_node(generate_query)
-builder.add_node(check_query)
-builder.add_node(run_query_node, "run_query")
 
-# Edges
+builder.add_node("list_tables", list_tables)
+builder.add_node("call_get_schema", call_get_schema)
+builder.add_node("get_schema", get_schema)
+builder.add_node("generate_query", generate_query)
+builder.add_node("check_query", check_query)
+builder.add_node("run_query", run_query)
+
 builder.add_edge(START, "list_tables")
 builder.add_edge("list_tables", "call_get_schema")
 builder.add_edge("call_get_schema", "get_schema")
 builder.add_edge("get_schema", "generate_query")
-builder.add_conditional_edges(
-    "generate_query",
-    should_continue,
-)
+builder.add_conditional_edges("generate_query", should_continue)
 builder.add_edge("check_query", "run_query")
 builder.add_edge("run_query", "generate_query")
 
 agent = builder.compile()
 
-def generate_sql(user_prompt: str):
-    print(f"generate_sql({user_prompt}) called.")
+
+def generate_sql(text: str, microservice_name: str):
+    print(f"generate_sql(text={text}, microservice_name={microservice_name}) called.")
+
+    if microservice_name not in MICROSERVICES_CATALOG:
+        raise ValueError(
+            f"Unknown microservice '{microservice_name}'. "
+            f"Expected one of: {list(MICROSERVICES_CATALOG.keys())}"
+        )
+
     last_message = None
     for step in agent.stream(
-            {"messages": [{"role": "user", "content": user_prompt}]},
-            stream_mode="values",
+        {
+            "microservice_name": microservice_name,
+            "messages": [{"role": "user", "content": text}],
+        },
+        stream_mode="values",
     ):
         last_message = step["messages"][-1]
+
     return last_message.content

@@ -168,7 +168,7 @@ const HomePage: React.FC = () => {
                 <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-6xl tracking-tight font-bold text-white mb-6 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 rounded-2xl transform hover:scale-105 transition-all duration-300 relative z-10 overflow-hidden animate-float">
                   <span className="block leading-[1.2] sm:leading-[1.3] mb-1 sm:mb-2 md:mb-3 relative z-10">Unified Data Platform</span>
                   <span className="block leading-[1.2] sm:leading-[1.3] bg-gradient-to-r from-blue-100 to-blue-200 bg-clip-text text-transparent relative z-10">
-                    of Fruits
+                    of Campus data
                   </span>
                 </h1>
               </div>
@@ -176,7 +176,7 @@ const HomePage: React.FC = () => {
             
             <ScrollReveal direction="up" delay={1000} duration={1000}>
               <p className="mt-6 sm:mt-8 max-w-2xl mx-auto text-lg sm:text-xl text-blue-200 leading-relaxed px-4">
-                Gisma is the data platform of Fruits, providing API services across multiple netwroks.
+                Gisma is the data platform of Campus data, providing API services across multiple netwroks.
               </p>
             </ScrollReveal>
             

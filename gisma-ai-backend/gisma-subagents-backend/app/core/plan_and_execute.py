@@ -60,7 +60,8 @@ planner_prompt = """
 Create the smallest correct plan for the objective.
 
 Rules:
-- Use multiple steps only when the request truly needs multiple microservices.
+- Use one microservice if it alone can fully answer the request.
+- Use multiple microservices only when the request requires combining or transferring data between services.
 - Each step must use exactly one microservice.
 - Never join tables from different microservices.
 - Use the listed relations only when moving data between services.
@@ -78,14 +79,16 @@ Objective:
 replanner_prompt = """
 Update the remaining plan using the completed steps.
 
-Rules:
-- Finish with the fewest additional steps.
-- If the answer can already be produced from completed step results, return the final response.
+Rules:.
+- If the objective can already be produced from completed step results, return the final response.
 - Otherwise, return only the remaining needed steps.
+- Stay in one microservice only if it can fully answer the request.
+- Use multiple microservices when the request requires combining or transferring data between services.
 - Each step must use exactly one microservice.
 - Never join tables from different microservices.
 - Use the listed relations only when moving data between services.
 - In cross-service steps, mention the exact field match from the relations.
+- Before moving to another microservice, first fetch the table and field values needed for the relation to that next microservice.
 - Use values found in completed step results as input to later steps.
 - If a needed list of ids, refs, or codes already appears in completed step results, use that list in the next step instead of creating a cross-service join.
 - Do not repeat completed steps.

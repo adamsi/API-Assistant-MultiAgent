@@ -65,6 +65,9 @@ planner_prompt = """
 Create the smallest correct plan for the objective.
 
 Rules:
+- The user may write in Hebrew, but the plan must use English canonical terms from the aliases.
+- First map Hebrew terms to the closest English terms from the aliases.
+- Prefer exact alias matches over guessed schema terms.
 - Use one microservice if it alone can fully answer the request.
 - Use multiple microservices only when the request requires combining or transferring data between services.
 - Each step must use exactly one microservice.
@@ -84,7 +87,9 @@ Objective:
 replanner_prompt = """
 Update the remaining plan using the completed steps.
 
-Rules:.
+Rules:
+- The user may write in Hebrew, but all remaining steps must use English canonical terms from the aliases.
+- Prefer exact alias matches over guessed schema terms.
 - If the completed step results can fully and correctly answer the objective, return the final response.
 - Otherwise, return only the remaining needed steps.
 - Stay in one microservice only if it can fully answer the request.

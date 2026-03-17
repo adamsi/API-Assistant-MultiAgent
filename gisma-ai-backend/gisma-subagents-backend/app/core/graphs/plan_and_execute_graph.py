@@ -15,6 +15,11 @@ def build_services_description() -> str:
     for service_name, config in MICROSERVICES_CATALOG.items():
         tables = ", ".join(config["tables"])
         lines.append(f"- {service_name}: tables {tables}")
+        aliases = config.get("aliases", [])
+        if aliases:
+            lines.append("  aliases:")
+            for alias in aliases:
+                lines.append(f"  - {alias['he']} -> {alias['en']}")
 
         relations = config.get("relations", [])
         if relations:

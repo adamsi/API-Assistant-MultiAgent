@@ -13,20 +13,29 @@ MICROSERVICES_CATALOG = {
     "students": {
         "db_url": settings.gisma_db_url,
         "tables": ["students", "student_cards"],
+        "aliases":
+            [
+                {"en": "enroll_year", "he": "שנת התחלה"},
+                {"en": "student with name='adam sion'", "he": "סטודנט הזהב"},
+            ],
         "relations": [],
     },
     "library": {
         "db_url": settings.gisma_db_url,
         "tables": ["library_members", "book_loans"],
+        "aliases": [],
         "relations": [],
     },
     "cafeteria": {
         "db_url": settings.gisma_db_url,
         "tables": ["meal_wallets", "meal_orders"],
+        "aliases":
+            [
+                {"en": "wallet balance", "he": "יתרת ארנק"}
+            ],
         "relations": [],
     },
 }
-
 
 MICROSERVICES_RELATIONS = {
     (

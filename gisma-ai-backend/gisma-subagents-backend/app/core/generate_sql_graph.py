@@ -87,10 +87,13 @@ def get_schema(state: SQLGenerateState):
     get_schema_tool = GET_SCHEMA_TOOL_BY_SERVICE[service_name]
 
     last_message = state["messages"][-1]
-    tool_call = last_message.tool_calls[0]
-    tool_message = get_schema_tool.invoke(tool_call)
+    tool_messages = []
 
-    return {"messages": [tool_message]}
+    for tool_call in last_message.tool_calls:
+        tool_message = get_schema_tool.invoke(tool_call)
+        tool_messages.append(tool_message)
+
+    return {"messages": tool_messages}
 
 
 generate_query_system_prompt = """
@@ -171,10 +174,13 @@ def run_query(state: SQLGenerateState):
     run_query_tool = RUN_QUERY_TOOL_BY_SERVICE[service_name]
 
     last_message = state["messages"][-1]
-    tool_call = last_message.tool_calls[0]
-    tool_message = run_query_tool.invoke(tool_call)
+    tool_messages = []
 
-    return {"messages": [tool_message]}
+    for tool_call in last_message.tool_calls:
+        tool_message = run_query_tool.invoke(tool_call)
+        tool_messages.append(tool_message)
+
+    return {"messages": tool_messages}
 
 
 def should_continue(state: SQLGenerateState) -> Literal[END, "check_query"]:

@@ -1,6 +1,6 @@
 import asyncio
 import operator
-from typing import Annotated, List, Tuple, Literal
+from typing import Annotated, List, Literal
 
 from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, START, END
@@ -15,6 +15,13 @@ def build_services_description() -> str:
     for service_name, config in MICROSERVICES_CATALOG.items():
         tables = ", ".join(config["tables"])
         lines.append(f"- {service_name}: tables {tables}")
+
+        relations = config.get("relations", [])
+        if relations:
+            lines.append("  relations:")
+            for relation in relations:
+                lines.append(f"  - {relation}")
+
     return "\n".join(lines)
 
 
@@ -26,10 +33,16 @@ class PlanStep(BaseModel):
     query: str = Field(description="Natural language query for that microservice")
 
 
+class PastStep(BaseModel):
+    service: str
+    query: str
+    result: str
+
+
 class PlanExecute(BaseModel):
     input: str
     plan: List[PlanStep] = Field(default_factory=list)
-    past_steps: Annotated[List[Tuple[str, str]], operator.add] = Field(default_factory=list)
+    past_steps: Annotated[List[PastStep], operator.add] = Field(default_factory=list)
     response: str = ""
 
 
@@ -38,19 +51,22 @@ class Plan(BaseModel):
 
 
 class ReplanOutput(BaseModel):
-    type: Literal["plan", "response"]
+    kind: Literal["plan", "response"]
     steps: List[PlanStep] = Field(default_factory=list)
     response: str = ""
 
 
 planner_prompt = """
-For the given objective, come up with a simple step by step plan.
-This plan should involve individual tasks that, if executed correctly, will yield the correct answer.
-Do not add unnecessary steps.
-The result of the final step should be enough to answer the user.
-Each step must contain:
-- service: one of the available microservices
-- query: the natural language query to send to that microservice
+Create the smallest correct plan for the objective.
+
+Rules:
+- Use multiple steps only when the request truly needs multiple microservices.
+- Each step must use exactly one microservice.
+- Never join tables from different microservices.
+- Use the listed relations only when moving data between services.
+- In cross-service steps, mention the exact field match from the relations.
+- Do not fetch data the user did not ask for.
+- If later steps depend on earlier steps, those later steps must use values obtained from earlier step results.
 
 Available microservices:
 {services}
@@ -60,30 +76,32 @@ Objective:
 """
 
 replanner_prompt = """
-For the given objective, come up with a simple step by step plan.
-This plan should involve individual tasks that, if executed correctly, will yield the correct answer.
-Do not add unnecessary steps.
+Update the remaining plan using the completed steps.
 
-Your objective was this:
+Rules:
+- Finish with the fewest additional steps.
+- If the answer can already be produced from completed step results, return the final response.
+- Otherwise, return only the remaining needed steps.
+- Each step must use exactly one microservice.
+- Never join tables from different microservices.
+- Use the listed relations only when moving data between services.
+- In cross-service steps, mention the exact field match from the relations.
+- Use values found in completed step results as input to later steps.
+- If a needed list of ids, refs, or codes already appears in completed step results, use that list in the next step instead of creating a cross-service join.
+- Do not repeat completed steps.
+- Do not add exploratory steps.
+
+Objective:
 {input}
 
 Available microservices:
 {services}
 
-Your original remaining plan was this:
+Remaining plan:
 {plan}
 
-You have currently done the following steps:
+Completed steps:
 {past_steps}
-
-Update your plan accordingly.
-If no more steps are needed and you can return to the user, then respond with the final response.
-Otherwise, return only the steps that still need to be done.
-Do not return previously completed steps.
-
-Return:
-- type="response" and fill response when the answer is ready
-- type="plan" and fill steps when more work is needed
 """
 
 
@@ -107,10 +125,20 @@ async def execute_step(state: PlanExecute):
         return {}
 
     step = state.plan[0]
+    print(f"\nEXECUTE: service={step.service}, query={step.query}")
+
     result = generate_sql(step.query, step.service)
 
+    print("STEP RESULT: " + result)
+
     return {
-        "past_steps": [(f"{step.service}: {step.query}", result)],
+        "past_steps": [
+            PastStep(
+                service=step.service,
+                query=step.query,
+                result=result,
+            )
+        ],
         "plan": state.plan[1:],
     }
 
@@ -121,11 +149,11 @@ async def replan_step(state: PlanExecute):
             input=state.input,
             services=SERVICES_DESCRIPTION,
             plan=state.plan,
-            past_steps=state.past_steps,
+            past_steps=[step.model_dump() for step in state.past_steps],
         )
     )
 
-    if output.type == "response":
+    if output.kind == "response":
         return {"response": output.response}
 
     return {"plan": output.steps}

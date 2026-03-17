@@ -1,2 +1,59 @@
 - Change `query` to `prompt` in websocket messaging.
 - Replace DocumentViewer.tsx and upload.tsx and [chatId].tsx and Chatbar.tsx and index.tsx
+
+
+
+--- EXCEL format in chat ---
+
+add markdownPipeTables.ts, MarkdownTableBlock.tsx
+
+add "exceljs": "^4.4.0", to package.json
+add "exceljs": "^4.4.0", to package-lock.json 
+
+
+
+----------in ChatMessage.tsx:--------------------
+
+replace <div className="prose whitespace-pre-wrap dark:prose-invert" style={{ direction: textDirection }}>
+                  {message.content}
+                </div>
+with   <div className="prose dark:prose-invert" style={{ direction: textDirection }}>
+                  {extractMarkdownPipeTables(message.content).map((part, idx) => {
+                    if (part.type === 'table') {
+                      return (
+                        <MarkdownTableBlock
+                          key={`table-${idx}`}
+                          data={part.data}
+                          filenameBase={`assistant-table-${messageIndex + 1}-${idx + 1}`}
+                        />
+                      );
+                    }
+
+                    return (
+                      <MemoizedReactMarkdown
+                        key={`text-${idx}`}
+                        remarkPlugins={[remarkGfm]}
+                      >
+                        {part.value}
+                      </MemoizedReactMarkdown>
+                    );
+                  })}
+                </div>
+
+
+and add following imports:
+
+import remarkGfm from 'remark-gfm';
+import { MemoizedReactMarkdown } from '@/components/Markdown/MemoizedReactMarkdown';
+import { extractMarkdownPipeTables } from '@/utils/markdownPipeTables';
+import { MarkdownTableBlock } from './MarkdownTableBlock';
+
+
+
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
-import { IconDownload } from '@tabler/icons-react';
+import { IconDownload, IconMaximize, IconX } from '@tabler/icons-react';
 import {
   Box,
-  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -9,10 +9,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material';
 import ExcelJS from 'exceljs';
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 
 export type MarkdownTableData = {
   headers: string[];
@@ -67,11 +66,53 @@ async function downloadTableAsXlsx(filenameBase: string, data: MarkdownTableData
   }
 }
 
+const iconButtonSx = { color: 'text.secondary', '&:hover': { color: 'primary.main' } };
+
+function TableContent({ normalized }: { normalized: MarkdownTableData }) {
+  return (
+    <Table size="small" sx={{ minWidth: 'max-content' }}>
+      <TableHead>
+        <TableRow>
+          {normalized.headers.map((h, idx) => (
+            <TableCell key={`${h}-${idx}`} sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
+              {h}
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {normalized.rows.map((row, rIdx) => (
+          <TableRow key={rIdx} hover>
+            {row.map((cell, cIdx) => (
+              <TableCell
+                key={`${rIdx}-${cIdx}`}
+                sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {cell}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
 export const MarkdownTableBlock: FC<{
   data: MarkdownTableData;
   filenameBase?: string;
 }> = ({ data, filenameBase = 'assistant-table' }) => {
   const [downloading, setDownloading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsModalOpen(false);
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isModalOpen]);
 
   const normalized = useMemo<MarkdownTableData>(() => {
     const headers = (data.headers ?? []).map((h) => (h ?? '').trim());
@@ -83,15 +124,18 @@ export const MarkdownTableBlock: FC<{
 
   return (
     <Box className="not-prose" sx={{ my: 1.5 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1 }}>
-        <Typography variant="subtitle2" sx={{ opacity: 0.8 }}>
-          Table
-        </Typography>
-        <Button
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0, mb: 0.5 }}>
+        <IconButton
           size="small"
-          variant="outlined"
+          onClick={() => setIsModalOpen(true)}
+          sx={iconButtonSx}
+          title="View full screen"
+        >
+          <IconMaximize size={18} />
+        </IconButton>
+        <IconButton
+          size="small"
           disabled={downloading || normalized.headers.length === 0}
-          startIcon={<IconDownload size={16} />}
           onClick={async () => {
             setDownloading(true);
             try {
@@ -100,10 +144,50 @@ export const MarkdownTableBlock: FC<{
               setDownloading(false);
             }
           }}
+          sx={iconButtonSx}
+          title="Download as Excel"
         >
-          {downloading ? 'Exporting…' : 'Download Excel'}
-        </Button>
+          <IconDownload size={18} />
+        </IconButton>
       </Box>
+
+      {/* Fullscreen Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div
+            className="relative bg-gray-950/95 backdrop-blur-xl w-full h-full sm:w-[90vw] sm:h-[90vh] sm:max-w-[1400px] flex flex-col max-w-full border border-white/30 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Table</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
+              >
+                <IconX className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-auto bg-gradient-to-br from-gray-800/50 via-gray-700/40 to-gray-800/50 p-4">
+              <TableContainer
+                component={Paper}
+                variant="outlined"
+                sx={{
+                  overflow: 'visible',
+                  backgroundColor: 'rgba(0,0,0,0.2)',
+                  '& .MuiTableCell-root': { color: 'rgba(255,255,255,0.9)' },
+                  '& .MuiTableHead .MuiTableCell-root': { color: 'rgba(255,255,255,0.95)' },
+                }}
+              >
+                <TableContent normalized={normalized} />
+              </TableContainer>
+            </div>
+          </div>
+        </div>
+      )}
 
       <TableContainer
         component={Paper}
@@ -114,45 +198,7 @@ export const MarkdownTableBlock: FC<{
           backgroundColor: 'transparent',
         }}
       >
-        <Table size="small" sx={{ tableLayout: 'fixed', minWidth: 720 }}>
-          <TableHead>
-            <TableRow>
-              {normalized.headers.map((h, idx) => (
-                <TableCell
-                  key={`${h}-${idx}`}
-                  sx={{
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {h}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {normalized.rows.map((row, rIdx) => (
-              <TableRow key={rIdx} hover>
-                {row.map((cell, cIdx) => (
-                  <TableCell
-                    key={`${rIdx}-${cIdx}`}
-                    sx={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                    title={cell}
-                  >
-                    {cell}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <TableContent normalized={normalized} />
       </TableContainer>
     </Box>
   );

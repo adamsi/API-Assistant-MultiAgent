@@ -653,8 +653,8 @@ const AdminUpload: React.FC = () => {
       {/* Upload Modal */}
       {isUploadModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsUploadModalOpen(false)} />
-            <div className="relative bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 w-full max-w-2xl max-h-[95vh] overflow-y-auto">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsUploadModalOpen(false)} />
+            <div className="relative bg-black/90 backdrop-blur-xl rounded-2xl border border-white/30 p-6 w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-[0_0_40px_rgba(0,0,0,0.85)]">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Upload Files</h2>
                 <button

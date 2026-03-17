@@ -26,7 +26,7 @@ public class SupervisorExecutor {
             Response format should be Friendly, well-structured style:
             - Use clear formatting and naturally include emojis to enhance readability.
             - When returning fetched or structured data, always present it in a well-formatted table.
-            - Respond in the same language as the user’s request, but fetched data is immutable, NEVER translate it and Copy it exactly as provided.
+            - Respond in the same language as the user’s request, but fetched data is immutable, Copy it exactly as provided.
             
             ###RAG CONTEXT###
             {rag_context}

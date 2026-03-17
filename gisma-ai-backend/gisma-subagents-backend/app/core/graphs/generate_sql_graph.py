@@ -19,27 +19,26 @@ LIST_TABLES_TOOL_BY_SERVICE = {}
 GET_SCHEMA_TOOL_BY_SERVICE = {}
 RUN_QUERY_TOOL_BY_SERVICE = {}
 
-print("--- MICROSERVICES ---")
-for service_name, service_config in MICROSERVICES_CATALOG.items():
-    db = SQLDatabase.from_uri(service_config["db_url"])
-    db_toolkit = SQLDatabaseToolkit(db=db, llm=model)
-    db_tools = db_toolkit.get_tools()
-
-    DBS_BY_SERVICE[service_name] = db
-    DB_TOOLKITS_BY_SERVICE[service_name] = db_toolkit
-    DB_TOOLS_BY_SERVICE[service_name] = db_tools
-
-    LIST_TABLES_TOOL_BY_SERVICE[service_name] = next(
-        tool for tool in db_tools if tool.name == "sql_db_list_tables"
-    )
-    GET_SCHEMA_TOOL_BY_SERVICE[service_name] = next(
-        tool for tool in db_tools if tool.name == "sql_db_schema"
-    )
-    RUN_QUERY_TOOL_BY_SERVICE[service_name] = next(
-        tool for tool in db_tools if tool.name == "sql_db_query"
-    )
-
-    print(f"\n=== {service_name} ===")
+def init_db_tools():
+    print("--- MICROSERVICES ---")
+    for service_name, service_config in MICROSERVICES_CATALOG.items():
+        db = SQLDatabase.from_uri(service_config["db_url"],
+                                  include_tables=service_config["tables"])
+        db_toolkit = SQLDatabaseToolkit(db=db, llm=model)
+        db_tools = db_toolkit.get_tools()
+        DBS_BY_SERVICE[service_name] = db
+        DB_TOOLKITS_BY_SERVICE[service_name] = db_toolkit
+        DB_TOOLS_BY_SERVICE[service_name] = db_tools
+        LIST_TABLES_TOOL_BY_SERVICE[service_name] = next(
+            tool for tool in db_tools if tool.name == "sql_db_list_tables"
+        )
+        GET_SCHEMA_TOOL_BY_SERVICE[service_name] = next(
+            tool for tool in db_tools if tool.name == "sql_db_schema"
+        )
+        RUN_QUERY_TOOL_BY_SERVICE[service_name] = next(
+            tool for tool in db_tools if tool.name == "sql_db_query"
+        )
+        print(f"\n=== {service_name} ===")
 
 
 # Graph shared state

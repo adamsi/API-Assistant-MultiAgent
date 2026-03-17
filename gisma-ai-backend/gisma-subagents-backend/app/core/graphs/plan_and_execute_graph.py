@@ -80,7 +80,7 @@ replanner_prompt = """
 Update the remaining plan using the completed steps.
 
 Rules:.
-- If the objective can already be produced from completed step results, return the final response.
+- If the completed step results can fully and correctly answer the objective, return the final response.
 - Otherwise, return only the remaining needed steps.
 - Stay in one microservice only if it can fully answer the request.
 - Use multiple microservices when the request requires combining or transferring data between services.

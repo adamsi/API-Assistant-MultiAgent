@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.core.plan_and_execute import plan_and_execute
+from app.core.graphs.plan_and_execute_graph import plan_and_execute
 from app.core.todo.get_api_entities_graph import get_api_entities
 
 router = APIRouter(prefix="/prompt")

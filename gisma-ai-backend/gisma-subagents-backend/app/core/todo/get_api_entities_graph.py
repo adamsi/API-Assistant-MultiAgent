@@ -7,8 +7,8 @@ from langgraph.constants import START
 from langgraph.graph import StateGraph, MessagesState
 
 from app.core.todo.api_toolkit import get_entity_by_name
-from app.core.generate_sql_graph import generate_sql
-from app.core.model import model
+from app.core.graphs.generate_sql_graph import generate_sql
+from app.core.utils.model import model
 
 gisma_primary_key = "name"
 

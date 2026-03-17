@@ -21,7 +21,7 @@ public class SubagentsTools {
 
     @Tool(description = "handle user original prompt")
     public String handleUserOriginalPrompt(String userOriginalPrompt) {
-        log.info("generateSql called. userOriginalPrompt: {}.", userOriginalPrompt);
+        log.info("handleUserOriginalPrompt called. userOriginalPrompt: {}.", userOriginalPrompt);
 
         return webClient.post()
                 .uri("/data")

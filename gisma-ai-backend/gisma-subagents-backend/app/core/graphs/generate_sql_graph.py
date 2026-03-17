@@ -6,8 +6,8 @@ from langchain_community.utilities import SQLDatabase
 from langchain.messages import AIMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
 
-from app.core.microservices_catalog import MICROSERVICES_CATALOG
-from app.core.model import model
+from app.core.utils.microservices_catalog import MICROSERVICES_CATALOG
+from app.core.utils.model import model
 
 
 # Per-microservice DB initialization

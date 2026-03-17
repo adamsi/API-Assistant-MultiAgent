@@ -5,9 +5,9 @@ from typing import Annotated, List, Literal
 from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, START, END
 
-from app.core.generate_sql_graph import generate_sql
-from app.core.microservices_catalog import MICROSERVICES_CATALOG
-from app.core.model import model
+from app.core.graphs.generate_sql_graph import generate_sql
+from app.core.utils.microservices_catalog import MICROSERVICES_CATALOG
+from app.core.utils.model import model
 
 
 def build_services_description() -> str:

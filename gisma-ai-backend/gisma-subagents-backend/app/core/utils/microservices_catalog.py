@@ -9,6 +9,7 @@ class TableField:
     field_name: str
 
 
+SERVICES_DESCRIPTION = ""
 MICROSERVICES_CATALOG = {
     "students": {
         "db_url": settings.gisma_db_url,
@@ -49,7 +50,7 @@ MICROSERVICES_RELATIONS = {
 }
 
 
-def _init_microservice_relations():
+def init_microservice_relations():
     for service in MICROSERVICES_CATALOG.values():
         service["relations"].clear()
 
@@ -58,4 +59,31 @@ def _init_microservice_relations():
         MICROSERVICES_CATALOG[right.service_name]["relations"].append(relation)
 
 
-_init_microservice_relations()
+def build_services_description() -> str:
+    lines = []
+    for service_name, config in MICROSERVICES_CATALOG.items():
+        tables = ", ".join(config["tables"])
+        lines.append(f"- {service_name}: tables {tables}")
+        aliases = config.get("aliases", [])
+        if aliases:
+            lines.append("  aliases:")
+            for alias in aliases:
+                lines.append(f"  - {alias['he']} -> {alias['en']}")
+
+        relations = config.get("relations", [])
+        if relations:
+            lines.append("  relations:")
+            for relation in relations:
+                lines.append(f"  - {relation}")
+
+    return "\n".join(lines)
+
+
+def init_microservices_catalog():
+    init_microservice_relations()
+    global SERVICES_DESCRIPTION
+    SERVICES_DESCRIPTION = build_services_description()
+
+
+def get_services_context():
+    return SERVICES_DESCRIPTION

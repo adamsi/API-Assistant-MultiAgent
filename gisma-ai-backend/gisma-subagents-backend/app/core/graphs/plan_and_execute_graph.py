@@ -6,31 +6,8 @@ from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, START, END
 
 from app.core.graphs.generate_sql_graph import generate_sql
-from app.core.utils.microservices_catalog import MICROSERVICES_CATALOG
+from app.core.utils.microservices_catalog import get_services_context
 from app.core.utils.model import model
-
-
-def build_services_description() -> str:
-    lines = []
-    for service_name, config in MICROSERVICES_CATALOG.items():
-        tables = ", ".join(config["tables"])
-        lines.append(f"- {service_name}: tables {tables}")
-        aliases = config.get("aliases", [])
-        if aliases:
-            lines.append("  aliases:")
-            for alias in aliases:
-                lines.append(f"  - {alias['he']} -> {alias['en']}")
-
-        relations = config.get("relations", [])
-        if relations:
-            lines.append("  relations:")
-            for relation in relations:
-                lines.append(f"  - {relation}")
-
-    return "\n".join(lines)
-
-
-SERVICES_DESCRIPTION = build_services_description()
 
 
 class PlanStep(BaseModel):
@@ -125,7 +102,7 @@ replanner = model.with_structured_output(ReplanOutput)
 async def plan_step(state: PlanExecute):
     plan = await planner.ainvoke(
         planner_prompt.format(
-            services=SERVICES_DESCRIPTION,
+            services=get_services_context(),
             objective=state.input,
         )
     )
@@ -160,7 +137,7 @@ async def replan_step(state: PlanExecute):
     output = await replanner.ainvoke(
         replanner_prompt.format(
             input=state.input,
-            services=SERVICES_DESCRIPTION,
+            services=get_services_context(),
             plan=state.plan,
             past_steps=[step.model_dump() for step in state.past_steps],
         )

@@ -39,19 +39,15 @@ class ReplanOutput(BaseModel):
 
 
 planner_prompt = """
-Create the smallest correct cross-service plan for the objective.
-
-Rules:
-- This workflow is only for cross-service requests.
-- The user may write in Hebrew, but the plan must use English canonical terms from the aliases.
-- Return only the steps needed to move through multiple microservices.
-- Each step must use exactly one microservice.
-- The steps must be ordered.
-- Later steps must explicitly depend on values produced by earlier steps.
-- Never join tables from different microservices.
-- Use the listed relations only when moving data between services.
-- When moving to another microservice, mention the field match from the listed relations in the step query.
-- Do not fetch data the user did not ask for.
+For the given objective, come up with a simple step by step cross-service plan,
+This plan should involve tasks that, if executed correctly, will yield the correct answer.
+Do not add any superfluous steps.
+The result of the final step should be the final answer.
+Make sure that each step has all the information needed. Do not skip steps.
+Each step must be one task for exactly one microservice.
+If a later step depends on an earlier step, make that dependency explicit in the later step.
+Use only the listed relations when moving from one microservice to another.
+Do not join tables across microservices in a single step.
 
 Available microservices:
 {services}
@@ -61,35 +57,30 @@ Objective:
 """
 
 replanner_prompt = """
-Update the remaining cross-service plan using the completed steps.
+For the given objective, update the remaining cross-service plan,
+The plan should involve tasks that, if executed correctly, will yield the correct answer.
+Do not add any superfluous steps.
+Make sure that each remaining step has all the information needed. Do not skip steps.
+Return only the steps that still need to be done.
+Each remaining step must be one task for exactly one microservice.
+Use completed step results as inputs to later steps when needed.
+Use only the listed relations when moving from one microservice to another.
+When moving to another microservice, make the relation explicit in the step.
+Do not join tables across microservices in a single step.
+Do not repeat completed steps.
+If the completed step results can fully and correctly answer the objective, return the final response.
 
-Rules:
-- This workflow is only for cross-service requests.
-- The user may write in Hebrew, but all remaining steps must use English canonical terms from the aliases.
-- Prefer exact alias matches over guessed schema terms.
-- If the completed step results can fully answer the objective, return the final response.
-- Otherwise, return only the remaining needed steps.
-- Each step must use exactly one microservice.
-- Never join tables from different microservices.
-- Use the listed relations only when moving data between services.
-- Before moving to another microservice, first fetch the values needed for the relation to that next microservice.
-- When moving to another microservice, mention the field match from the listed relations in the step query.
-- Use values found in completed step results as input to later steps.
-- Do not repeat completed steps.
-- Do not add exploratory steps.
-- Return `response` only when the work is complete. Otherwise return `plan` with at least one remaining step.
-
-Objective:
+Your objective was this:
 {input}
+
+Your original plan was this:
+{plan}
+
+You have currently done these steps:
+{past_steps}
 
 Available microservices:
 {services}
-
-Remaining plan:
-{plan}
-
-Completed steps:
-{past_steps}
 """
 
 

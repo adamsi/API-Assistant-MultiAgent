@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from langgraph.graph import END, START, StateGraph
 
 from app.core.graphs.generate_sql_graph import generate_sql
-from app.core.graphs.plan_and_execute_graph import plan_and_execute
+from app.core.graphs.plan_and_execute_graph import _plan_and_execute
 from app.core.utils.microservices_catalog import get_services_context
 from app.core.utils.model import model
 
@@ -54,6 +54,7 @@ async def classify_route(state: RouterState):
             input=state.input,
         )
     )
+    print(f"DECISION is: {decision}")
     return {
         "route": decision.route,
         "service": decision.service,
@@ -70,9 +71,10 @@ def run_single_service(state: RouterState):
     }
 
 
-def run_cross_service(state: RouterState):
+async def run_cross_service(state: RouterState):
+    result = await _plan_and_execute(state.input)
     return {
-        "response": plan_and_execute(state.input),
+        "response": result.get("response", ""),
     }
 
 

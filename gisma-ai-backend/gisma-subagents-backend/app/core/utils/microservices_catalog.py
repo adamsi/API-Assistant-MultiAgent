@@ -15,8 +15,7 @@ MICROSERVICES_CATALOG = {
         "tables": ["students", "student_cards"],
         "aliases":
             [
-                {"en": "enroll_year", "he": "שנת התחלה"},
-                {"en": "student with name='adam sion'", "he": "סטודנט הזהב"},
+                {"en": "enroll_year", "he": "שנת התחלה"}
             ],
         "relations": [],
     },

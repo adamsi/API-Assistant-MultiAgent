@@ -1,0 +1,3 @@
+SA_LLM_MODEL=xxxxx
+OPENAI_API_KEY=xxxxxx
+GISMA_DB_URL=xxxxxxx

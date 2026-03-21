@@ -1,7 +1,6 @@
 import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
-import { throttle } from '@/utils';
 import { IconArrowDown } from '@tabler/icons-react';
 import {
   FC,
@@ -9,6 +8,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -57,13 +57,15 @@ export const Chat: FC<Props> = memo(
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const lastLayoutChatIdRef = useRef<string | undefined>(undefined);
+    const hadMessagesRef = useRef(false);
 
-    const scrollToBottom = useCallback(() => {
-      if (autoScrollEnabled) {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        textareaRef.current?.focus();
+    const scrollContainerToBottomInstant = useCallback(() => {
+      const el = chatContainerRef.current;
+      if (el) {
+        el.scrollTop = el.scrollHeight;
       }
-    }, [autoScrollEnabled]);
+    }, []);
 
     const handleScroll = () => {
       if (chatContainerRef.current) {
@@ -84,29 +86,57 @@ export const Chat: FC<Props> = memo(
     const handleScrollDown = () => {
       chatContainerRef.current?.scrollTo({
         top: chatContainerRef.current.scrollHeight,
-        behavior: 'smooth',
+        behavior: 'auto',
       });
     };
 
-    const scrollDown = useCallback(() => {
-      if (autoScrollEnabled && messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, [autoScrollEnabled]);
+    // Snap to bottom before first paint when opening/switching a thread or when
+    // messages first load — avoids the visible "scroll down" animation.
+    useLayoutEffect(() => {
+      const container = chatContainerRef.current;
+      const id = conversation.chatId ?? '';
 
-    // Use requestAnimationFrame for smooth scrolling during streaming
-    useEffect(() => {
-      if (messageIsStreaming) {
-        // Smooth scroll during streaming
-        const rafId = requestAnimationFrame(() => {
-          scrollDown();
-        });
-        return () => cancelAnimationFrame(rafId);
-      } else {
-        // Regular scroll when not streaming
-        scrollDown();
+      if (!container || conversation.messages.length === 0) {
+        if (conversation.messages.length === 0) {
+          hadMessagesRef.current = false;
+        }
+        lastLayoutChatIdRef.current = id;
+        return;
       }
-    }, [conversation.messages, messageIsStreaming, scrollDown]);
+
+      const chatSwitched = lastLayoutChatIdRef.current !== id;
+      const messagesAppeared = !hadMessagesRef.current;
+
+      if (chatSwitched) {
+        lastLayoutChatIdRef.current = id;
+      }
+      hadMessagesRef.current = true;
+
+      if (chatSwitched || messagesAppeared) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }, [conversation.chatId, conversation.messages.length]);
+
+    // Follow new content while streaming or when auto-scroll is on (instant).
+    useEffect(() => {
+      if (!autoScrollEnabled) return;
+      if (!chatContainerRef.current || conversation.messages.length === 0) return;
+
+      const run = () => {
+        scrollContainerToBottomInstant();
+      };
+
+      if (messageIsStreaming) {
+        const rafId = requestAnimationFrame(run);
+        return () => cancelAnimationFrame(rafId);
+      }
+      run();
+    }, [
+      conversation.messages,
+      messageIsStreaming,
+      autoScrollEnabled,
+      scrollContainerToBottomInstant,
+    ]);
 
     useEffect(() => {
       setCurrentMessage(

@@ -159,7 +159,7 @@ export const MarkdownTableBlock: FC<{
             onClick={() => setIsModalOpen(false)}
           />
           <div
-            className="relative bg-gray-950/95 backdrop-blur-xl w-full h-full sm:w-[90vw] sm:h-[90vh] sm:max-w-[1400px] flex flex-col max-w-full border border-white/30 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
+            className="relative bg-gray-950/95 backdrop-blur-xl w-full min-w-0 h-full sm:w-[90vw] sm:h-[90vh] sm:max-w-[1400px] flex flex-col max-w-full border border-white/30 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
@@ -171,12 +171,17 @@ export const MarkdownTableBlock: FC<{
                 <IconX className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex-1 min-h-0 overflow-auto bg-gradient-to-br from-gray-800/50 via-gray-700/40 to-gray-800/50 p-4">
+            <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden bg-gradient-to-br from-gray-800/50 via-gray-700/40 to-gray-800/50 p-4">
               <TableContainer
                 component={Paper}
                 variant="outlined"
                 sx={{
-                  overflow: 'visible',
+                  flex: 1,
+                  minHeight: 0,
+                  minWidth: 0,
+                  width: '100%',
+                  maxWidth: '100%',
+                  overflow: 'auto',
                   backgroundColor: 'rgba(0,0,0,0.2)',
                   '& .MuiTableCell-root': { color: 'rgba(255,255,255,0.9)' },
                   '& .MuiTableHead .MuiTableCell-root': { color: 'rgba(255,255,255,0.95)' },

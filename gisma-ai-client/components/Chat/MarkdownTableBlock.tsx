@@ -162,14 +162,35 @@ export const MarkdownTableBlock: FC<{
             className="relative bg-gray-950/95 backdrop-blur-xl w-full min-w-0 h-full sm:w-[90vw] sm:h-[90vh] sm:max-w-[1400px] flex flex-col max-w-full border border-white/30 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
-              <h2 className="text-lg sm:text-xl font-semibold text-white">Table</h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-all duration-200"
-              >
-                <IconX className="w-5 h-5" />
-              </button>
+            <div className="flex flex-shrink-0 items-center justify-between gap-3 px-4 py-4 sm:px-6">
+              <h2 className="text-lg font-semibold text-white sm:text-xl">Table</h2>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  disabled={downloading || normalized.headers.length === 0}
+                  onClick={async () => {
+                    setDownloading(true);
+                    try {
+                      await downloadTableAsXlsx(filenameBase, normalized);
+                    } finally {
+                      setDownloading(false);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-800/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  title="Download as Excel"
+                >
+                  <IconDownload className="h-5 w-5" />
+                  <span className="hidden text-sm sm:inline">Download</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-800/50 hover:text-white"
+                  aria-label="Close"
+                >
+                  <IconX className="h-5 w-5" />
+                </button>
+              </div>
             </div>
             <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden bg-gradient-to-br from-gray-800/50 via-gray-700/40 to-gray-800/50 p-4">
               <TableContainer

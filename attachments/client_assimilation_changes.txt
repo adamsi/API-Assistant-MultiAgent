@@ -1,5 +1,6 @@
 - Change `query` to `prompt` in websocket messaging.
-- Replace DocumentViewer.tsx and upload.tsx and [chatId].tsx and Chatbar.tsx and index.tsx and Chat.tsx
+- Replace DocumentViewer.tsx and upload.tsx and [chatId].tsx and Chatbar.tsx and index.tsx and Chat.tsx, 
+and ChatbarSettings, and apiEntityTypes.ts and entities.tsx
 
 
 

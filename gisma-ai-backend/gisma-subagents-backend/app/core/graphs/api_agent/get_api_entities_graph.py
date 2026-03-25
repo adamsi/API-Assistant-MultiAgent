@@ -7,7 +7,7 @@ from langgraph.graph import StateGraph, MessagesState
 from pydantic import BaseModel, Field
 
 from app.core.graphs.api_agent.api_toolkit import get_entity_by_name
-from app.core.graphs.db_agent.plan_and_execute_graph import plan_and_execute
+from app.core.graphs.db_agent.router_graph import route_prompt
 from app.core.utils.model import model
 
 gisma_primary_key = "name"
@@ -26,7 +26,7 @@ class EntityIds(BaseModel):
 def generate_db_ids(state: ApiEntitiesState):
     # artificial tool call
     tool_call = {
-        "name": "plan_and_execute",
+        "name": "route_prompt",
         "args": {},
         "id": str(uuid.uuid4()),
         "type": "tool_call",
@@ -36,7 +36,7 @@ def generate_db_ids(state: ApiEntitiesState):
         f"get {gisma_primary_key} column of {state['entity_type']} "
         f"which {state['filter']}"
     )
-    sql_generate_response = plan_and_execute(planning_prompt)
+    sql_generate_response = route_prompt(planning_prompt)
     tool_message = AIMessage(content=sql_generate_response)
 
     return {"messages": [tool_call_message, tool_message]}

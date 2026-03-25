@@ -32,6 +32,7 @@ Route the user request to either one microservice or a cross-service workflow.
 
 Choose single_service when one microservice can answer the request on its own.
 Choose cross_service only when the answer requires combining data from multiple microservices or using a listed relation to move from one service to another.
+If user request is not informative enough or you're not sure, choose single_service.
 
 For single_service, return the exact microservice name.
 For cross_service, leave service empty.

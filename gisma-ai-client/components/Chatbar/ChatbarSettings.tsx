@@ -1,4 +1,4 @@
-import { IconMoon, IconSun, IconUser, IconLogout, IconUpload, IconShield } from '@tabler/icons-react';
+import { IconMoon, IconSun, IconUser, IconLogout, IconUpload, IconApi } from '@tabler/icons-react';
 import { FC, useState } from 'react';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
@@ -49,6 +49,18 @@ export const ChatbarSettings: FC<Props> = ({
         }
         lightMode={lightMode}
       />
+
+      {user && (
+        <SidebarButton
+          text="API entities"
+          icon={<IconApi size={18} />}
+          onClick={() => {
+            dispatch(setLastVisitedChatId(selectedConversation?.chatId || null));
+            router.push('/entities');
+          }}
+          lightMode={lightMode}
+        />
+      )}
 
       {/* Admin Upload Button - Only show for admin users */}
       {isAdmin && (

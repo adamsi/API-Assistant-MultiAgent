@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Service
@@ -29,6 +31,7 @@ public class SubagentsTools {
                 .bodyValue(Map.of("prompt", userOriginalPrompt))
                 .retrieve()
                 .bodyToMono(String.class)
+                .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(200)))
                 .doOnError(Throwable::printStackTrace)
                 .onErrorReturn("Could not fetch data due to unexpected error")
                 .block();

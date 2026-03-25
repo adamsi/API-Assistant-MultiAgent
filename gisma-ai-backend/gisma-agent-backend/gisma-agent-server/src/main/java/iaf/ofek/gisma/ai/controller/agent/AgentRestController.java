@@ -1,8 +1,8 @@
 package iaf.ofek.gisma.ai.controller.agent;
 
 import iaf.ofek.gisma.ai.agent.SupervisorExecutor;
-import iaf.ofek.gisma.ai.dto.agent.PromptRequest;
 import iaf.ofek.gisma.ai.dto.agent.PromptResponse;
+import iaf.ofek.gisma.ai.dto.agent.UserApiPrompt;
 import iaf.ofek.gisma.ai.dto.agent.UserPrompt;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.util.retry.Retry;
 
-import java.util.Map;
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/prompt")
@@ -35,19 +36,20 @@ public class AgentRestController {
         return response;
     }
 
-    @PostMapping("/fruits")
-    public PromptResponse handleFruitsPrompt(@RequestBody PromptRequest request) {
-        log.info("handleFruitsPrompt started. prompt: {}", request);
+    @PostMapping("/api")
+    public PromptResponse handleApiPrompt(@RequestBody UserApiPrompt request) {
+        log.info("handleApiPrompt started. prompt: {}", request);
         String apiResponse = webClient.post()
-                .uri("/fruits")
-                .bodyValue(Map.of("prompt", request.prompt()))
+                .uri("/api")
+                .bodyValue(request)
                 .retrieve()
                 .bodyToMono(String.class)
+                .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(200)))
                 .onErrorReturn("Could not fetch data due to unexcepted error")
                 .block();
 
         var response = new PromptResponse(apiResponse);
-        log.info("handleFruitsPrompt ended. response: {}", response);
+        log.info("handleApiPrompt ended. response: {}", response);
 
         return response;
     }

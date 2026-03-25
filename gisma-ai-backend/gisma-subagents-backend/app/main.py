@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from app.core.graphs.generate_sql_graph import init_db_tools
+from app.core.graphs.db_agent.generate_sql_graph import init_db_tools
 from app.core.utils.microservices_catalog import init_microservices_catalog
 
 load_dotenv()

@@ -4,8 +4,8 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from langgraph.graph import END, START, StateGraph
 
-from app.core.graphs.generate_sql_graph import generate_sql
-from app.core.graphs.plan_and_execute_graph import _plan_and_execute
+from app.core.graphs.db_agent.generate_sql_graph import generate_sql
+from app.core.graphs.db_agent.plan_and_execute_graph import _plan_and_execute
 from app.core.utils.microservices_catalog import get_services_context
 from app.core.utils.model import model
 

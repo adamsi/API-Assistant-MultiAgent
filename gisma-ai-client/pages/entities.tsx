@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { IconArrowLeft, IconBraces, IconCopy, IconMaximize, IconX } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconBraces,
+  IconChevronDown,
+  IconCopy,
+  IconMaximize,
+  IconX,
+} from '@tabler/icons-react';
 import toast from 'react-hot-toast';
 import ParticlesBackground from '@/components/Global/Particles';
 import LoadingSpinner from '@/components/Global/LoadingSpinner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getUser } from '@/store/slices/authSlice';
 import { api, handleAxiosError } from '@/utils/api';
-import { API_ENTITY_TYPES, ApiEntityType } from '@/constants/apiEntityTypes';
 
 type PromptApiResponse = {
   response: string;
 };
+
+/** Until GET /prompt/api/catalog succeeds, same as before: one service + entity. */
+const DEFAULT_MAP: Record<string, string[]> = { students: ['students'] };
 
 function formatJsonBlock(raw: string): string {
   const trimmed = raw.trim();
@@ -33,7 +42,10 @@ const EntitiesPage: React.FC = () => {
   const { user, loading: authLoading } = useAppSelector((state) => state.auth);
   const { lastVisitedChatId } = useAppSelector((state) => state.chatMemory);
 
-  const [entityType, setEntityType] = useState<ApiEntityType>(API_ENTITY_TYPES[0]);
+  const [entitiesByService, setEntitiesByService] = useState(DEFAULT_MAP);
+  const [serviceNames, setServiceNames] = useState<string[]>(() => Object.keys(DEFAULT_MAP).sort());
+  const [service, setService] = useState('students');
+  const [entityType, setEntityType] = useState('students');
   const [filter, setFilter] = useState('');
   const [resultText, setResultText] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,6 +57,26 @@ const EntitiesPage: React.FC = () => {
       dispatch(getUser());
     }
   }, [dispatch, user]);
+
+  useEffect(() => {
+    if (!user) return;
+    api
+      .get<Array<{ name: string; entityTypes: string[] }>>('/prompt/api/catalog')
+      .then(({ data }) => {
+        const map: Record<string, string[]> = {};
+        for (const row of data ?? []) {
+          if (row?.name) map[row.name] = row.entityTypes ?? [];
+        }
+        if (Object.keys(map).length === 0) return;
+        const names = Object.keys(map).sort();
+        const first = names[0];
+        setEntitiesByService(map);
+        setServiceNames(names);
+        setService(first);
+        setEntityType(map[first]?.[0] ?? '');
+      })
+      .catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -91,7 +123,7 @@ const EntitiesPage: React.FC = () => {
     try {
       const { data } = await api.post<PromptApiResponse>(
         '/prompt/api',
-        { prompt, entityType },
+        { prompt, entityType, service },
         { timeout: 120000 }
       );
       setResultText(formatJsonBlock(data.response));
@@ -151,31 +183,74 @@ const EntitiesPage: React.FC = () => {
                 API entities
               </h1>
               <p className="mt-1 text-sm text-white/60">
-                Choose an entity type, enter a filter, then fetch JSON from the backend.
+                Choose a service and entity type, enter a filter, then fetch JSON from the backend.
               </p>
             </div>
 
-            <div className="min-w-0 max-w-full shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-4 shadow-xl backdrop-blur-xl sm:p-6">
-              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end">
-                <div className="min-w-0 flex-1 space-y-2">
-                  <label className="block text-sm font-medium text-blue-200/90" htmlFor="entity-type">
+            <div className="min-w-0 max-w-full shrink-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-black/35 p-4 shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-6">
+              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:gap-3">
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <label
+                    className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45"
+                    htmlFor="service"
+                  >
+                    Service
+                  </label>
+                  <div className="group relative">
+                    <select
+                      id="service"
+                      value={service}
+                      onChange={(e) => {
+                        const name = e.target.value;
+                        setService(name);
+                        const entities = entitiesByService[name] ?? [];
+                        setEntityType(entities[0] ?? '');
+                      }}
+                      className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-zinc-700/80 bg-zinc-950 px-3.5 pr-10 text-sm font-medium text-zinc-100 shadow-inner shadow-black/50 transition-colors duration-200 hover:border-zinc-600 hover:bg-zinc-900 focus:border-blue-500/70 focus:outline-none focus:ring-2 focus:ring-blue-500/25 [color-scheme:dark]"
+                    >
+                      {serviceNames.map((name) => (
+                        <option key={name} value={name} className="bg-zinc-950 text-zinc-100">
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                    <IconChevronDown
+                      className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 transition-colors group-hover:text-zinc-400"
+                      aria-hidden
+                    />
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <label
+                    className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45"
+                    htmlFor="entity-type"
+                  >
                     Entity type
                   </label>
-                  <select
-                    id="entity-type"
-                    value={entityType}
-                    onChange={(e) => setEntityType(e.target.value as ApiEntityType)}
-                    className="w-full cursor-pointer rounded-xl border border-white/20 bg-black/30 px-4 py-3 text-white focus:border-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  >
-                    {API_ENTITY_TYPES.map((t) => (
-                      <option key={t} value={t} className="bg-gray-900">
-                        {t}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="group relative">
+                    <select
+                      id="entity-type"
+                      value={entityType}
+                      onChange={(e) => setEntityType(e.target.value)}
+                      className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-zinc-700/80 bg-zinc-950 px-3.5 pr-10 text-sm font-medium text-zinc-100 shadow-inner shadow-black/50 transition-colors duration-200 hover:border-zinc-600 hover:bg-zinc-900 focus:border-blue-500/70 focus:outline-none focus:ring-2 focus:ring-blue-500/25 [color-scheme:dark]"
+                    >
+                      {(entitiesByService[service] ?? []).map((t) => (
+                        <option key={t} value={t} className="bg-zinc-950 text-zinc-100">
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                    <IconChevronDown
+                      className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 transition-colors group-hover:text-zinc-400"
+                      aria-hidden
+                    />
+                  </div>
                 </div>
-                <div className="min-w-0 flex-[2] space-y-2">
-                  <label className="block text-sm font-medium text-blue-200/90" htmlFor="filter">
+                <div className="min-w-0 flex-[2] space-y-1.5">
+                  <label
+                    className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45"
+                    htmlFor="filter"
+                  >
                     Filter
                   </label>
                   <input
@@ -184,7 +259,7 @@ const EntitiesPage: React.FC = () => {
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
                     placeholder="e.g. names matching Maya, or all students"
-                    className="w-full min-w-0 rounded-xl border border-white/20 bg-black/30 px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="h-11 w-full min-w-0 rounded-lg border border-zinc-700/80 bg-zinc-950 px-3.5 text-sm text-zinc-100 shadow-inner shadow-black/50 placeholder:text-zinc-500 transition-colors duration-200 hover:border-zinc-600 hover:bg-zinc-900 focus:border-blue-500/70 focus:outline-none focus:ring-2 focus:ring-blue-500/25 [color-scheme:dark]"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -197,7 +272,7 @@ const EntitiesPage: React.FC = () => {
                   type="button"
                   onClick={handleFetch}
                   disabled={loading}
-                  className="flex h-[46px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 text-sm font-medium text-white shadow-lg transition-all duration-apple hover:from-blue-500 hover:to-indigo-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:h-[46px]"
+                  className="flex h-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 px-7 text-sm font-semibold text-white shadow-[0_4px_20px_rgba(37,99,235,0.35)] transition-all duration-200 hover:from-blue-500 hover:via-blue-500 hover:to-indigo-500 hover:shadow-[0_6px_24px_rgba(37,99,235,0.45)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
@@ -209,9 +284,12 @@ const EntitiesPage: React.FC = () => {
                   )}
                 </button>
               </div>
-              
+
               <p className="mt-3 text-xs text-white/40">
-                Sends <code className="rounded bg-white/10 px-1 py-0.5 font-mono text-[11px]">POST /prompt/api</code> with your filter as <code className="font-mono text-[11px]">prompt</code> and the selected entity type.
+                Sends <code className="rounded bg-white/10 px-1 py-0.5 font-mono text-[11px]">POST /prompt/api</code> with{' '}
+                <code className="font-mono text-[11px]">prompt</code>, <code className="font-mono text-[11px]">service</code>, and{' '}
+                <code className="font-mono text-[11px]">entityType</code>. Catalog loads from{' '}
+                <code className="font-mono text-[11px]">GET /prompt/api/catalog</code> when available.
               </p>
 
               {error && (

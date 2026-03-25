@@ -15,6 +15,7 @@ gisma_primary_key = "name"
 class ApiEntitiesState(MessagesState):
     filter: str
     entity_type: str
+    service: str
     ids_to_fetch: List[str]
     final_entities: List[dict]
 
@@ -76,7 +77,7 @@ def build_ids_to_fetch(state: ApiEntitiesState):
 
 def fetch_api_entities(state: ApiEntitiesState):
     entities = [
-        get_entity_by_name(_id, state["entity_type"])
+        get_entity_by_name(_id, state["entity_type"], state["service"])
         for _id in state["ids_to_fetch"]
     ]
     return {"final_entities": entities}
@@ -93,7 +94,11 @@ builder.add_edge("build_ids_to_fetch", "fetch_api_entities")
 agent = builder.compile()
 
 
-def get_api_entities(_filter: str, entity_type: str):
-    print(f"get_api_entities(filter={_filter}, entity_type={entity_type}) called.")
-    final_state = agent.invoke({"filter": _filter, "entity_type": entity_type})
+def get_api_entities(_filter: str, entity_type: str, service: str):
+    print(
+        f"get_api_entities(filter={_filter}, entity_type={entity_type}, service={service}) called."
+    )
+    final_state = agent.invoke(
+        {"filter": _filter, "entity_type": entity_type, "service": service}
+    )
     return final_state["final_entities"]

@@ -1,8 +1,24 @@
 import requests
 
-API_BASES_BY_ENTITY_TYPE = {
-    "fruits": "https://www.fruityvice.com/api/fruit",
+api_entities_dict = {
+    "students": {
+        "graphql_url": "https://example.com/graphql",
+        "entities": ["students", "vegetables"],
+        "query": (
+            'query {{ {entityType}(filter: {{ name: {{ equals: {{ value: "{name}" }} }} }}) }}'
+        ),
+    },
 }
+
+
+def get_api_entities_catalog():
+    return [
+        {
+            "name": service_name,
+            "entityTypes": service_config["entities"],
+        }
+        for service_name, service_config in api_entities_dict.items()
+    ]
 
 STUDENTS = [
     {"name": "Maya Cohen", "age": 21},
@@ -13,17 +29,29 @@ STUDENTS = [
 ]
 
 
-def get_entity_by_name(name: str, entityType: str):
-    print(f"get_entity_by_name(name={name}, entityType={entityType}) called.")
+def get_entity_by_name(name: str, entityType: str, service: str):
+    print(
+        f"get_entity_by_name(name={name}, entityType={entityType}, service={service}) called."
+    )
 
-    # api_base = API_BASES_BY_ENTITY_TYPE.get(entityType)
-    # if not api_base:
+    # service_config = api_entities_dict.get(service)
+    # if not service_config:
     #     raise ValueError(
-    #         f"Unknown entityType '{entityType}'. "
-    #         f"Expected one of: {list(API_BASES_BY_ENTITY_TYPE.keys())}"
+    #         f"Unknown service '{service}'. "
+    #         f"Expected one of: {list(api_entities_dict.keys())}"
     #     )
     #
-    # response = requests.get(f"{api_base}/{name}")
+    # if entityType not in service_config["entities"]:
+    #     raise ValueError(
+    #         f"Unknown entityType '{entityType}' for service '{service}'. "
+    #         f"Expected one of: {service_config['entities']}"
+    #     )
+    #
+    # query = service_config["query"].format(entityType=entityType, name=name)
+    # response = requests.post(
+    #     service_config["graphql_url"],
+    #     json={"query": query},
+    # )
     # response.raise_for_status()
     # return response.json()
 

@@ -2,10 +2,13 @@ package iaf.ofek.gisma.ai.controller.agent;
 
 import iaf.ofek.gisma.ai.agent.SupervisorExecutor;
 import iaf.ofek.gisma.ai.dto.agent.PromptResponse;
+import iaf.ofek.gisma.ai.dto.agent.ServiceApi;
 import iaf.ofek.gisma.ai.dto.agent.UserApiPrompt;
 import iaf.ofek.gisma.ai.dto.agent.UserPrompt;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.util.List;
 
 @RestController
 @RequestMapping("/prompt")
@@ -51,6 +55,22 @@ public class AgentRestController {
         var response = new PromptResponse(apiResponse);
         log.info("handleApiPrompt ended. response: {}", response);
 
+        return response;
+    }
+
+    @GetMapping("/api/catalog")
+    public List<ServiceApi> handleApiCatalog() {
+        log.info("handleApiCatalog started.");
+        List<ServiceApi> response = webClient.get()
+                .uri("/api/catalog")
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<ServiceApi>>() {
+                })
+                .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(200)))
+                .onErrorReturn(List.of())
+                .block();
+
+        log.info("handleApiCatalog ended. response: {}", response);
         return response;
     }
 }

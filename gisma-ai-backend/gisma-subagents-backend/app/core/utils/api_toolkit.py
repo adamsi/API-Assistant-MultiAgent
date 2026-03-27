@@ -1,14 +1,5 @@
 import requests
-
-api_entities_dict = {
-    "students": {
-        "graphql_url": "https://example.com/graphql",
-        "entities": ["students", "vegetables"],
-        "query": (
-            'query {{ {entityType}(filter: {{ name: {{ equals: {{ value: "{name}" }} }} }}) }}'
-        ),
-    },
-}
+from app.core.data.configurations import api_entities_dict
 
 
 def get_api_entities_catalog():

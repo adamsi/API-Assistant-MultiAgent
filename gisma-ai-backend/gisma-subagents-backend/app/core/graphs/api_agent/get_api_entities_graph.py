@@ -6,7 +6,7 @@ from langgraph.constants import START
 from langgraph.graph import StateGraph, MessagesState
 from pydantic import BaseModel, Field
 
-from app.core.graphs.api_agent.api_toolkit import get_entity_by_name
+from app.core.utils.api_toolkit import get_entity_by_name
 from app.core.graphs.db_agent.router_graph import route_prompt
 from app.core.utils.model import model
 

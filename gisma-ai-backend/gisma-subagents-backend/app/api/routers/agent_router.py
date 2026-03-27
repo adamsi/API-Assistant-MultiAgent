@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.core.graphs.api_agent.api_toolkit import get_api_entities_catalog
+from app.core.utils.api_toolkit import get_api_entities_catalog
 from app.core.graphs.db_agent.router_graph import route_prompt
 from app.core.graphs.api_agent.get_api_entities_graph import get_api_entities
 

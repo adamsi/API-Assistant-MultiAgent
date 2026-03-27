@@ -18,8 +18,8 @@ import java.util.UUID;
 public class SupervisorExecutor {
     private static final String SYSTEM_MESSAGE_TEMPLATE = """
             You are the Gisma API Assistant.
-            Answer user queries using documentation (RAG CONTEXT), chat memory, and live data via mcp tools.
-            if the answer requires data fetching or is not in RAG CONTEXT, you must use mcp tools.
+            Answer user queries using RAG CONTEXT, chat memory, and live data via mcp tools.
+            if answer for a question is available in the RAG CONTEXT, NEVER call mcp tool for this question.
             preserve the exact user intent. Do NOT modify or reinterpret.
             Do not use outside knowledge, Do not answer non related questions.
             

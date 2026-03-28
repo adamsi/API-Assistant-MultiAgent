@@ -24,6 +24,7 @@ api_entities_dict = {
 MICROSERVICES_CATALOG = {
     "students": {
         "db_url": settings.gisma_db_url,
+        "schema": "gisma",
         "tables": ["students", "student_cards"],
         "aliases": [
             {"en": "enroll_year", "he": "שנת התחלה"},
@@ -32,12 +33,14 @@ MICROSERVICES_CATALOG = {
     },
     "library": {
         "db_url": settings.gisma_db_url,
+        "schema": "gisma",
         "tables": ["library_members", "book_loans"],
         "aliases": [],
         "relations": [],
     },
     "cafeteria": {
         "db_url": settings.gisma_db_url,
+        "schema": "gisma",
         "tables": ["meal_wallets", "meal_orders"],
         "aliases": [
             {"en": "wallet balance", "he": "יתרת ארנק"},
@@ -57,4 +60,3 @@ MICROSERVICES_RELATIONS = {
         TableField("cafeteria", "meal_wallets", "card_code"),
     ): "student_cards.code <-> meal_wallets.card_code",
 }
-

@@ -23,6 +23,7 @@ def init_db_tools():
     print("--- MICROSERVICES ---")
     for service_name, service_config in MICROSERVICES_CATALOG.items():
         db = SQLDatabase.from_uri(service_config["db_url"],
+                                  schema=service_config.get("schema"),
                                   include_tables=service_config["tables"])
         db_toolkit = SQLDatabaseToolkit(db=db, llm=model)
         db_tools = db_toolkit.get_tools()

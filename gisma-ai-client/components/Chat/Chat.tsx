@@ -17,6 +17,9 @@ import { ChatLoader } from './ChatLoader';
 import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 interface Props {
   conversation: Conversation;
   messageIsStreaming: boolean;
@@ -92,7 +95,7 @@ export const Chat: FC<Props> = memo(
 
     // Snap to bottom before first paint when opening/switching a thread or when
     // messages first load — avoids the visible "scroll down" animation.
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       const container = chatContainerRef.current;
       const id = conversation.chatId ?? '';
 

@@ -8,7 +8,7 @@ python-dotenv
 pydantic
 pydantic_settings
 sqlalchemy
-pg8000
+psycopg2-binary
 oracledb
 langchain_community
 requests

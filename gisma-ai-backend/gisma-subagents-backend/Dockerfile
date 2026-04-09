@@ -1,5 +1,12 @@
-FROM alpine:latest
+FROM python:3.11
 
 WORKDIR /app
 
-COPY upload_python_folder/ ./data/
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8082
+
+CMD ["uvicorn", "app.main:app", "--port", "8082"]
